@@ -6,7 +6,15 @@ peek remembers which directories you use most frequently, so you can "list" them
 
 Inspired by [z](https://github.com/rupa/z) and [autojump](https://github.com/wting/autojump).
 
-**Repository:** [https://github.com/execRooted/peek](https://github.com/execRooted/peek)
+--- 
+
+If you found this project interesting and want to help me out, buy me a coffee :)
+
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-%23FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/execrooted)
+
+
+---
+
 
 ## Installation
 
@@ -16,7 +24,7 @@ The recommended way to install peek is via the install script:
 curl -sSfL https://raw.githubusercontent.com/execRooted/peek/main/install.sh | sh
 ```
 
-Or, if you have Rust installed:
+If that fails and you have Rust installed:
 
 ```sh
 cargo install peek --locked
@@ -122,6 +130,6 @@ peek import autojump # from autojump
 peek import fasd     # from fasd
 ```
 
-## License
+---
 
-MIT
+Made by execRooted
