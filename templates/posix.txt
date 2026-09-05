@@ -37,24 +37,6 @@ __hview_ls() {
     \command ls "$@" {%- if echo %} && __hview_pwd {%- endif %}
 }
 
-# Wrapper for ls to automatically add listed directories to hview.
-__hview_ls_wrapper() {
-    \command ls "$@" || return $?
-    if [ "$#" -ge 1 ]; then
-        i=$#
-        while [ "$i" -gt 0 ]; do
-            # shellcheck disable=SC2016
-            eval "arg=\${$i}"
-            if [ -d "$arg" ]; then
-                \command hview add -- "$arg"
-                break
-            fi
-            i=$((i - 1))
-        done
-    fi
-}
-alias ls=__hview_ls_wrapper
-
 {{ section }}
 # Hook configuration for hview.
 #
@@ -114,27 +96,27 @@ __hview_h() {
     __hview_doctor
 
     if [ "$#" -eq 0 ]; then
-        \command ls ~
+        ls ~
     elif [ "$#" -eq 1 ] && [ "$1" = '-' ]; then
         if [ -n "${OLDPWD}" ]; then
-            \command ls "${OLDPWD}"
+            ls "${OLDPWD}"
         else
             # shellcheck disable=SC2016
             \command printf 'hview: $OLDPWD is not set'
             return 1
         fi
     elif [ "$#" -eq 1 ] && (\command cd -- "$1") >/dev/null 2>&1; then
-        \command ls "$1"
+        ls "$1"
     else
         __hview_result="$(\command hview query --exclude "$(__hview_pwd || \command true)" -- "$@")" &&
-            \command ls "${__hview_result}"
+            ls "${__hview_result}"
     fi
 }
 
 # Jump to a directory using interactive search.
 __hview_hi() {
     __hview_doctor
-    __hview_result="$(\command hview query --interactive -- "$@")" && \command ls "${__hview_result}"
+    __hview_result="$(\command hview query --interactive -- "$@")" && ls "${__hview_result}"
 }
 
 {{ section }}

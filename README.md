@@ -103,24 +103,6 @@ hi foo             # interactive selection (using fzf)
 h foo<SPACE><TAB>  # show interactive completions
 ```
 
-## How it works
-
-hview automatically tracks directories when you run `ls` on them, so they're available for `h`/`hi` jumps without any extra steps. When you run `ls` on a directory, hview's shell integration adds that directory to its database in the background. The next time you want to jump there, just type `h <keyword>` or `hi <keyword>` and hview will find it.
-
-For example:
-
-```sh
-ls programs/mc/
-# ... files listed, programs/mc/ is now in hview's database ...
-
-h mc
-# jumps to programs/mc/
-```
-
-This works with any `ls` invocation — `ls .`, `ls ..`, `ls /path/to/dir`, etc. — as long as hview's shell integration is initialized.
-
-> **Note:** Nushell and Elvish don't support this yet due to alias-recursion limitations. Build compiles cleanly. Tests pass on bash/fish.
-
 ## Configuration
 
 hview can be configured using environment variables:

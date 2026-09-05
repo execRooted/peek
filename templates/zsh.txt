@@ -28,20 +28,6 @@ function __hview_ls() {
     \command ls -- "$@" {%- if echo %} && __hview_pwd {%- endif %}
 }
 
-# Wrapper for ls to automatically add listed directories to hview.
-__hview_real_ls="ls"
-if [[ $(type -t ls 2>/dev/null) == "alias" ]]; then
-    __hview_real_ls="$(alias ls | sed "s/alias ls='\(.*\)'/\1/")"
-fi
-
-__hview_ls_wrapper() {
-    eval "\command $__hview_real_ls \"\$@\"" || return $?
-    if [[ $# -ge 1 ]] && [[ -d "${@: -1}" ]]; then
-        \command hview add -- "${@: -1}"
-    fi
-}
-alias ls=__hview_ls_wrapper
-
 {{ section }}
 # Hook configuration for hview.
 #
@@ -102,18 +88,17 @@ function __hview_doctor() {
 function __hview_h() {
     __hview_doctor
     if [[ "$#" -eq 0 ]]; then
-        \command ls ~
+        ls ~
     elif [[ "$#" -eq 1 ]] && [[ "$1" = '-' ]]; then
-        \command ls "${OLDPWD}"
+        ls "${OLDPWD}"
     elif [[ "$#" -eq 1 ]] && { [[ "$1" =~ ^[-+][0-9]+$ ]] || (\builtin cd -q -- "$1") &>/dev/null; }; then
-        \command ls "$1"
+        ls "$1"
     elif [[ "$#" -eq 2 ]] && [[ "$1" = "--" ]]; then
-        \command ls "$2"
+        ls "$2"
     else
         \builtin local result
         # shellcheck disable=SC2312
-        result="$(\command hview query --exclude "$(__hview_pwd)" -- "$@")" &&
-            \command ls "${result}"
+        result="$(\command hview query --exclude "$(__hview_pwd)" -- "$@")" && ls "${result}"
     fi
 }
 
@@ -121,7 +106,7 @@ function __hview_h() {
 function __hview_hi() {
     __hview_doctor
     \builtin local result
-    result="$(\command hview query --interactive -- "$@")" && \command ls "${result}"
+    result="$(\command hview query --interactive -- "$@")" && ls "${result}"
 }
 
 {{ section }}
