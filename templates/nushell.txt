@@ -58,7 +58,7 @@ export-env {
 # Jump to a directory using only keywords.
 export def --env --wrapped __hview_h [...rest: directory] {
   match $rest {
-    [] => { ls ~ },
+    [] => { ls . },
     [ '-' ] => { ls - },
     [ $arg ] if (try { ls $arg; true } catch { false }) => {},
     _ => {

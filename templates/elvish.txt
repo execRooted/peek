@@ -47,7 +47,7 @@ if (builtin:not (builtin:eq $E:__hview_shlvl $E:SHLVL)) {
 # Jump to a directory using only keywords.
 fn __hview_h {|@rest|
     if (builtin:eq [] $rest) {
-        ls ~
+        ls .
     } elif (builtin:eq [-] $rest) {
         ls $oldpwd
     } elif (and ('builtin:==' (builtin:count $rest) 1) (path:is-dir &follow-symlink=$true $rest[0])) {

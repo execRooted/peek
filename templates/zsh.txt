@@ -88,7 +88,7 @@ function __hview_doctor() {
 function __hview_h() {
     __hview_doctor
     if [[ "$#" -eq 0 ]]; then
-        ls ~
+        ls .
     elif [[ "$#" -eq 1 ]] && [[ "$1" = '-' ]]; then
         ls "${OLDPWD}"
     elif [[ "$#" -eq 1 ]] && { [[ "$1" =~ ^[-+][0-9]+$ ]] || (\builtin cd -q -- "$1") &>/dev/null; }; then

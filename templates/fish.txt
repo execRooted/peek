@@ -66,7 +66,7 @@ end
 function __hview_h
     set -l argc (builtin count $argv)
     if test $argc -eq 0
-        ls $HOME
+        ls .
     else if test "$argv" = -
         ls -
     else if test $argc -eq 1 -a -d $argv[1]

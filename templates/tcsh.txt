@@ -42,7 +42,7 @@ unset __hview_precmd
 # Jump to a directory using only keywords.
 alias __hview_h 'set __hview_args = (\!*)\
 if ("$#__hview_args" == 0) then\
-    ls ~\
+    ls .\
 else\
     if ("$#__hview_args" == 1 && "$__hview_args[1]" == "-") then\
         ls -\
