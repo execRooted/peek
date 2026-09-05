@@ -99,8 +99,15 @@ function __hview_h() {
         \command hview add -- "$2"
     else
         \builtin local result
-        # shellcheck disable=SC2312
-        result="$(\command hview query --exclude "$(__hview_pwd)" -- "$@")" && ls "${result}" && \command hview add -- "${result}"
+        result="$(\command hview query --list --exclude "$(__hview_pwd)" -- "$@")"
+        if [[ -n "$result" ]]; then
+            count=$(printf '%s' "$result" | wc -l)
+            if [[ "$count" -eq 1 ]]; then
+                ls "$result" && \command hview add -- "$result"
+            elif [[ "$count" -gt 1 ]]; then
+                result="$(\command hview query --interactive --exclude "$(__hview_pwd)" -- "$@")" && ls "${result}"
+            fi
+        fi
     fi
 }
 

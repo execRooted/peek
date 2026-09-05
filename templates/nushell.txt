@@ -64,7 +64,15 @@ export def --env --wrapped __hview_h [...rest: directory] {
       ^hview add -- $arg
     },
     _ => {
-      ls (^hview query --exclude $env.PWD -- ...$rest | str trim -r -c "\n")
+      let matches = (^hview query --list --exclude $env.PWD -- ...$rest | str trim -r -c "\n")
+      if ($matches != "") {
+        let count = ($matches | lines | length)
+        if ($count == 1) {
+          ls $matches
+        } else {
+          ls (^hview query --interactive --exclude $env.PWD -- ...$rest | str trim -r -c "\n")
+        }
+      }
     }
   }
 {%- if echo %}

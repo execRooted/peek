@@ -76,9 +76,15 @@ function __hview_h
         ls -- $argv[2]
         hview add -- $argv[2]
     else
-        set -l result (command hview query --exclude (__hview_pwd) -- $argv)
-        and ls $result
-        and hview add -- $result
+        set -l matches (command hview query --list --exclude (__hview_pwd) -- $argv)
+        set -l count (count $matches)
+        if test $count -eq 1
+            ls $matches
+            hview add -- $matches
+        else if test $count -gt 1
+            set -l result (command hview query --interactive --exclude (__hview_pwd) -- $argv)
+            and ls $result
+        end
     end
 end
 

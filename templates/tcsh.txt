@@ -49,8 +49,15 @@ else\
     else if ("$#__hview_args" == 1 && -d "$__hview_args[1]") then\
         ls "$__hview_args[1]"; hview add -- "$__hview_args[1]"\
     else\
-        set __hview_pwd = `{{ pwd_cmd }}`\
-        set __hview_result = "`hview query --exclude '"'"'$__hview_pwd'"'"' -- $__hview_args`" && ls "$__hview_result" && hview add -- "$__hview_result"\
+        set __hview_list = "`hview query --exclude '"'"'$__hview_pwd'"'"' --list -- $__hview_args`"\
+        if ("$__hview_list" != "") then\
+            set __hview_count = `echo "$__hview_list" | grep -c '^'`\
+            if ($__hview_count == 1) then\
+                ls "$__hview_list"; hview add -- "$__hview_list"\
+            else if ($__hview_count > 1) then\
+                set __hview_result = "`hview query --exclude '"'"'$__hview_pwd'"'"' --interactive -- $__hview_args`" && ls "$__hview_result"\
+            endif\
+        endif\
     endif\
 endif'
 

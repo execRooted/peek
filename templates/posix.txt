@@ -109,9 +109,16 @@ __hview_h() {
         ls "$1"
         \command hview add -- "$1"
     else
-        __hview_result="$(\command hview query --exclude "$(__hview_pwd || \command true)" -- "$@")" &&
-            ls "${__hview_result}" &&
-            \command hview add -- "${__hview_result}"
+        __hview_result="$(\command hview query --list --exclude "$(__hview_pwd || \command true)" -- "$@")"
+        if [ -n "$__hview_result" ]; then
+            count=$(printf '%s' "$__hview_result" | wc -l)
+            if [ "$count" -eq 1 ]; then
+                ls "$__hview_result" && \command hview add -- "$__hview_result"
+            elif [ "$count" -gt 1 ]; then
+                __hview_result="$(\command hview query --interactive --exclude "$(__hview_pwd || \command true)" -- "$@")" &&
+                    ls "${__hview_result}"
+            fi
+        fi
     fi
 }
 

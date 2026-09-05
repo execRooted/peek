@@ -105,14 +105,28 @@ function global:__hview_h {
     else {
         $result = __hview_pwd
         if ($null -ne $result) {
-            $result = __hview_bin query --exclude $result "--" @args
+            $list = __hview_bin query --list --exclude $result "--" @args
         }
         else {
-            $result = __hview_bin query "--" @args
+            $list = __hview_bin query --list "--" @args
         }
-        if ($LASTEXITCODE -eq 0) {
-            __hview_ls $result
-            hview add "--" $result
+        if ($LASTEXITCODE -eq 0 -and $list) {
+            $count = ($list -split "`n").Count
+            if ($count -eq 1) {
+                __hview_ls $list
+                hview add "--" $list
+            }
+            else {
+                if ($null -ne $result) {
+                    $result = __hview_bin query --interactive --exclude $result "--" @args
+                }
+                else {
+                    $result = __hview_bin query --interactive "--" @args
+                }
+                if ($LASTEXITCODE -eq 0) {
+                    __hview_ls $result
+                }
+            }
         }
     }
 }

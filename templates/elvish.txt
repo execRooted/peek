@@ -56,11 +56,19 @@ fn __hview_h {|@rest|
     } else {
         var path
         try {
-            set path = (hview query --exclude $pwd -- $@rest)
+            set path = (hview query --list --exclude $pwd -- $@rest)
         } catch {
         } else {
-            ls $path
-            hview add -- $path
+            if (!= $path "") {
+                set path_count = (builtin:count (str:split "\n" $path))
+                if (== $path_count 1) {
+                    ls $path
+                    hview add -- $path
+                } else {
+                    set path = (hview query --interactive --exclude $pwd -- $@rest)
+                    ls $path
+                }
+            }
         }
     }
 }

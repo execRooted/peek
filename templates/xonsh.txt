@@ -127,18 +127,27 @@ def __hview_h(args: list[str]) -> None:
         try:
             hview = __hview_bin()
             cmd = subprocess.run(
-                [hview, "query", "--exclude", __hview_pwd(), "--"] + args,
+                [hview, "query", "--list", "--exclude", __hview_pwd(), "--"] + args,
                 check=True,
                 env=__hview_env(),
                 stdout=subprocess.PIPE,
             )
+            matches = cmd.stdout.decode("utf-8").strip()
+            if matches:
+                count = len(matches.splitlines())
+                if count == 1:
+                    __hview_ls(matches)
+                    subprocess.run([hview, "add", "--", matches], check=False)
+                else:
+                    cmd = subprocess.run(
+                        [hview, "query", "--interactive", "--exclude", __hview_pwd(), "--"] + args,
+                        check=True,
+                        env=__hview_env(),
+                        stdout=subprocess.PIPE,
+                    )
+                    __hview_ls(cmd.stdout[:-1])
         except subprocess.CalledProcessError as exc:
             raise HviewSilentException() from exc
-
-        result = cmd.stdout[:-1]
-        __hview_ls(result)
-        hview = __hview_bin()
-        subprocess.run([hview, "add", "--", result], check=False)
 
 
 @__hview_errhandler
