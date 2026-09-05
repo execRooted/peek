@@ -20,7 +20,7 @@ If you found this project interesting and want to help me out, buy me a coffee :
 The recommended way to install hview is via the install script:
 
 ```sh
-curl -sSfL https://raw.githubusercontent.com/execRooted/hview/main/install.sh | sh
+curl -sSfL https://raw.githubusercontent.com/execRooted/hview/master/install.sh | sh
 ```
 
 If that fails and you have Rust installed:
