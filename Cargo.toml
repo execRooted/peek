@@ -12,6 +12,38 @@ repository = "https://github.com/execRooted/hview"
 rust-version = "1.88.0"
 version = "1.0.0"
 
+exclude = [
+    "target/",
+    ".git/",
+    "*.orig",
+    "*.bk",
+    "*.old",
+    "*.bak",
+    "*.swp",
+    "*.swo",
+    "*~",
+    ".#*",
+    ".env*",
+    "*.d",
+    "*.pdb",
+    "*.so",
+    "*.dylib",
+    "*.a",
+    "*.lib",
+    "*.o",
+    "*.rlib",
+    "*.exe",
+    "*.dll",
+    "debug/",
+    "release/",
+    "tests/output/",
+    "tmp/",
+    "temp/",
+    "coverage/",
+    "*.profraw",
+    "*.profdata",
+]
+
 [badges]
 maintenance = { status = "actively-developed" }
 
