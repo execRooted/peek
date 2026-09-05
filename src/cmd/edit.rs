@@ -52,20 +52,20 @@ impl Edit {
                 // Interface
                 "--bind=\
 btab:up,\
-ctrl-r:reload(peek edit reload),\
-ctrl-d:reload(peek edit delete {2..}),\
-ctrl-w:reload(peek edit increment {2..}),\
-ctrl-s:reload(peek edit decrement {2..}),\
+ctrl-r:reload(hview edit reload),\
+ctrl-d:reload(hview edit delete {2..}),\
+ctrl-w:reload(hview edit increment {2..}),\
+ctrl-s:reload(hview edit decrement {2..}),\
 ctrl-z:ignore,\
 double-click:ignore,\
 enter:abort,\
-start:reload(peek edit reload),\
+start:reload(hview edit reload),\
 tab:down",
                 "--cycle",
                 "--keep-right",
                 // Layout
                 "--border=sharp",
-                "--border-label=  peek-edit  ",
+                "--border-label=  hview-edit  ",
                 "--header=\
 ctrl-r:reload   \tctrl-d:delete
 ctrl-w:increment\tctrl-s:decrement

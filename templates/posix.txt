@@ -4,10 +4,10 @@
 # shellcheck shell=sh
 
 {{ section }}
-# Utility functions for peek.
+# Utility functions for hview.
 #
 
-# pwd based on the value of _PEEK_RESOLVE_SYMLINKS.
+# pwd based on the value of _HVIEW_RESOLVE_SYMLINKS.
 {%- decl pwd -%}
 {%- if resolve_symlinks -%}
 {%- let pwd = "\\command pwd -P" -%}
@@ -17,28 +17,28 @@
 {%- if cfg!(windows) %}
 if \command -v cygpath >/dev/null
 then
-  __peek_pwd() {
+  __hview_pwd() {
     \command cygpath -w "$({{ pwd }})"
   }
 else
-  __peek_pwd() {
+  __hview_pwd() {
     {{ pwd }}
   }
 fi
 {%- else %}
-__peek_pwd() {
+__hview_pwd() {
     {{ pwd }}
 }
 {%- endif %}
 
-# ls + custom logic based on the value of _PEEK_ECHO.
-__peek_ls() {
+# ls + custom logic based on the value of _HVIEW_ECHO.
+__hview_ls() {
     # shellcheck disable=SC2164
-    \command ls "$@" {%- if echo %} && __peek_pwd {%- endif %}
+    \command ls "$@" {%- if echo %} && __hview_pwd {%- endif %}
 }
 
 {{ section }}
-# Hook configuration for peek.
+# Hook configuration for hview.
 #
 
 {% match hook %}
@@ -47,53 +47,53 @@ __peek_ls() {
 
 {%- when InitHook::Prompt -%}
 # Hook to add new entries to the database.
-__peek_hook() {
-    \command peek add -- "$(__peek_pwd || \command true)"
+__hview_hook() {
+    \command hview add -- "$(__hview_pwd || \command true)"
 }
 
 # Initialize hook.
-if [ "${PS1:=}" = "${PS1#*\$(__peek_hook)}" ]; then
-    PS1="${PS1}\$(__peek_hook)"
+if [ "${PS1:=}" = "${PS1#*\$(__hview_hook)}" ]; then
+    PS1="${PS1}\$(__hview_hook)"
 fi
 
 # Report common issues.
-__peek_doctor() {
+__hview_doctor() {
 {%- if hook != InitHook::Prompt %}
     return 0
 {%- else %}
-    [ "${_PEEK_DOCTOR:-1}" -eq 0 ] && return 0
+    [ "${_HVIEW_DOCTOR:-1}" -eq 0 ] && return 0
     case "${PS1:-}" in
-    *__peek_hook*) return 0 ;;
+    *__hview_hook*) return 0 ;;
     *) ;;
     esac
 
-    _PEEK_DOCTOR=0
+    _HVIEW_DOCTOR=0
     \command printf '%s\n' \
-        'peek: detected a possible configuration issue.' \
-        'Please ensure that peek is initialized right at the end of your shell configuration file.' \
+        'hview: detected a possible configuration issue.' \
+        'Please ensure that hview is initialized right at the end of your shell configuration file.' \
         '' \
         'If the issue persists, consider filing an issue at:' \
-        'https://github.com/execRooted/peek/issues' \
+        'https://github.com/execRooted/hview/issues' \
         '' \
-        'Disable this message by setting _PEEK_DOCTOR=0.' \
+        'Disable this message by setting _HVIEW_DOCTOR=0.' \
         '' >&2
 {%- endif %}
 }
 
 {%- when InitHook::Pwd -%}
 \command printf "%s\n%s\n" \
-    "peek: PWD hooks are not supported on POSIX shells." \
-    "        Use 'peek init posix --hook prompt' instead."
+    "hview: PWD hooks are not supported on POSIX shells." \
+    "        Use 'hview init posix --hook prompt' instead."
 
 {%- endmatch %}
 
 {{ section }}
-# When using peek with --no-cmd, alias these internal functions as desired.
+# When using hview with --no-cmd, alias these internal functions as desired.
 #
 
 # Jump to a directory using only keywords.
-__peek_p() {
-    __peek_doctor
+__hview_h() {
+    __hview_doctor
 
     if [ "$#" -eq 0 ]; then
         ls ~
@@ -102,25 +102,25 @@ __peek_p() {
             ls "${OLDPWD}"
         else
             # shellcheck disable=SC2016
-            \command printf 'peek: $OLDPWD is not set'
+            \command printf 'hview: $OLDPWD is not set'
             return 1
         fi
     elif [ "$#" -eq 1 ] && (\command cd -- "$1") >/dev/null 2>&1; then
         ls "$1"
     else
-        __peek_result="$(\command peek query --exclude "$(__peek_pwd || \command true)" -- "$@")" &&
-            ls "${__peek_result}"
+        __hview_result="$(\command hview query --exclude "$(__hview_pwd || \command true)" -- "$@")" &&
+            ls "${__hview_result}"
     fi
 }
 
 # Jump to a directory using interactive search.
-__peek_pi() {
-    __peek_doctor
-    __peek_result="$(\command peek query --interactive -- "$@")" && ls "${__peek_result}"
+__hview_hi() {
+    __hview_doctor
+    __hview_result="$(\command hview query --interactive -- "$@")" && ls "${__hview_result}"
 }
 
 {{ section }}
-# Commands for peek. Disable these using --no-cmd.
+# Commands for hview. Disable these using --no-cmd.
 #
 
 {%- match cmd %}
@@ -128,12 +128,12 @@ __peek_pi() {
 
 \command unalias {{cmd}} >/dev/null 2>&1 || \true
 {{cmd}}() {
-    __peek_p "$@"
+    __hview_h "$@"
 }
 
 \command unalias {{cmd}}i >/dev/null 2>&1 || \true
 {{cmd}}i() {
-    __peek_pi "$@"
+    __hview_hi "$@"
 }
 
 {%- when None %}
@@ -143,6 +143,6 @@ __peek_pi() {
 {%- endmatch %}
 
 {{ section }}
-# To initialize peek, add this to your configuration:
+# To initialize hview, add this to your configuration:
 #
-# eval "$(peek init posix --hook prompt)"
+# eval "$(hview init posix --hook prompt)"

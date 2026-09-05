@@ -1,33 +1,33 @@
-.TH "ZOXIDE" "1" "2021-04-12" "" "zoxide"
+.TH "HVIEW" "1" "2021-04-12" "" "hview"
 .SH NAME
-\fBzoxide-init\fR - generate shell configuration for zoxide
+\fBhview-init\fR - generate shell configuration for hview
 .SH SYNOPSIS
-.B zoxide init SHELL [OPTIONS]
+.B hview init SHELL [OPTIONS]
 .SH DESCRIPTION
-To initialize zoxide on your shell:
+To initialize hview on your shell:
 .TP
 .B bash
 Add this to the \fBend\fR of your config file (usually \fB~/.bashrc\fR):
 .sp
 .nf
-    \fBeval "$(zoxide init bash)"\fR
+    \fBeval "$(hview init bash)"\fR
 .fi
 .TP
 .B elvish
 Add this to the \fBend\fR of your config file (usually \fB~/.elvish/rc.elv\fR):
 .sp
 .nf
-    \fBeval $(zoxide init elvish | slurp)\fR
+    \fBeval $(hview init elvish | slurp)\fR
 .fi
 .sp
-Note: zoxide only supports elvish v0.18.0 and above.
+Note: hview only supports elvish v0.18.0 and above.
 .TP
 .B fish
 Add this to the \fBend\fR of your config file (usually
 \fB~/.config/fish/config.fish\fR):
 .sp
 .nf
-    \fBzoxide init fish | source\fR
+    \fBhview init fish | source\fR
 .fi
 .TP
 .B nushell
@@ -35,46 +35,46 @@ Add this to the \fBend\fR of your env file (find it by running
 \fB$nu.env-path\fR in Nushell):
 .sp
 .nf
-    \fBzoxide init nushell | save -f ~/.zoxide.nu\fR
+    \fBhview init nushell | save -f ~/.hview.nu\fR
 .fi
 .sp
 Now, add this to the \fBend\fR of your config file (find it by running
 \fB$nu.config-path\fR in Nushell):
 .sp
 .nf
-    \fBsource ~/.zoxide.nu\fR
+    \fBsource ~/.hview.nu\fR
 .fi
 .sp
-Note: zoxide only supports Nushell v0.106.0+.
+Note: hview only supports Nushell v0.106.0+.
 .TP
 .B powershell
 Add this to the \fBend\fR of your config file (find it by running \fBecho
 $profile\fR in PowerShell):
 .sp
 .nf
-    \fBInvoke-Expression (& { (zoxide init powershell | Out-String) })\fR
+    \fBInvoke-Expression (& { (hview init powershell | Out-String) })\fR
 .fi
 .TP
 .B tcsh
 Add this to the \fBend\fR of your config file (usually \fB~/.tcshrc\fR):
 .sp
 .nf
-    \fBzoxide init tcsh > ~/.zoxide.tcsh\fR
-    \fBsource ~/.zoxide.tcsh\fR
+    \fBhview init tcsh > ~/.hview.tcsh\fR
+    \fBsource ~/.hview.tcsh\fR
 .fi
 .TP
 .B xonsh
 Add this to the \fBend\fR of your config file (usually \fB~/.xonshrc\fR):
 .sp
 .nf
-    \fBexecx($(zoxide init xonsh), 'exec', __xonsh__.ctx, filename='zoxide')\fR
+    \fBexecx($(hview init xonsh), 'exec', __xonsh__.ctx, filename='hview')\fR
 .fi
 .TP
 .B zsh
 Add this to the \fBend\fR of your config file (usually \fB~/.zshrc\fR):
 .sp
 .nf
-    \fBeval "$(zoxide init zsh)"\fR
+    \fBeval "$(hview init zsh)"\fR
 .fi
 .TP
 .B any POSIX shell
@@ -82,7 +82,7 @@ Add this to the \fBend\fR of your config file (usually \fB~/.zshrc\fR):
 Add this to the \fBend\fR of your config file:
 .sp
 .nf
-    \fBeval "$(zoxide init posix --hook prompt)"\fR
+    \fBeval "$(hview init posix --hook prompt)"\fR
 .fi
 .SH OPTIONS
 .TP
@@ -98,7 +98,7 @@ POSIX shells).
 Print help information.
 .TP
 .B --hook HOOK
-Changes how often zoxide increments a directory's score:
+Changes how often hview increments a directory's score:
 .TS
 tab(|);
 l l.
@@ -108,12 +108,12 @@ l l.
 .TE
 .TP
 .B --no-cmd
-Prevents zoxide from defining the \fBz\fR and \fBzi\fR commands. These functions
-will still be available in your shell as \fB__zoxide_z\fR and \fB__zoxide_zi\fR,
+Prevents hview from defining the \fBz\fR and \fBzi\fR commands. These functions
+will still be available in your shell as \fB__hview_h\fR and \fB__hview_hi\fR,
 should you choose to redefine them.
 .SH REPORTING BUGS
 For any issues, feature requests, or questions, please visit:
 .sp
-\fBhttps://github.com/ajeetdsouza/zoxide/issues\fR
+\fBhttps://github.com/ajeetdsouza/hview/issues\fR
 .SH AUTHOR
 Ajeet D'Souza \fB<98ajeet@gmail.com>\fR

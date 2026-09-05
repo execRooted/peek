@@ -2,12 +2,12 @@
 using namespace System.Management.Automation
 using namespace System.Management.Automation.Language
 
-Register-ArgumentCompleter -Native -CommandName 'peek' -ScriptBlock {
+Register-ArgumentCompleter -Native -CommandName 'hview' -ScriptBlock {
     param($wordToComplete, $commandAst, $cursorPosition)
 
     $commandElements = $commandAst.CommandElements
     $command = @(
-        'peek'
+        'hview'
         for ($i = 1; $i -lt $commandElements.Count; $i++) {
             $element = $commandElements[$i]
             if ($element -isnot [StringConstantExpressionAst] -or
@@ -20,7 +20,7 @@ Register-ArgumentCompleter -Native -CommandName 'peek' -ScriptBlock {
     }) -join ';'
 
     $completions = @(switch ($command) {
-        'peek' {
+        'hview' {
             [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('-V', '-V ', [CompletionResultType]::ParameterName, 'Print version')
@@ -33,7 +33,7 @@ Register-ArgumentCompleter -Native -CommandName 'peek' -ScriptBlock {
             [CompletionResult]::new('remove', 'remove', [CompletionResultType]::ParameterValue, 'Remove a directory from the database')
             break
         }
-        'peek;add' {
+        'hview;add' {
             [CompletionResult]::new('-s', '-s', [CompletionResultType]::ParameterName, 'The rank to increment the entry if it exists or initialize it with if it doesn''t')
             [CompletionResult]::new('--score', '--score', [CompletionResultType]::ParameterName, 'The rank to increment the entry if it exists or initialize it with if it doesn''t')
             [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help')
@@ -42,7 +42,7 @@ Register-ArgumentCompleter -Native -CommandName 'peek' -ScriptBlock {
             [CompletionResult]::new('--version', '--version', [CompletionResultType]::ParameterName, 'Print version')
             break
         }
-        'peek;edit' {
+        'hview;edit' {
             [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('-V', '-V ', [CompletionResultType]::ParameterName, 'Print version')
@@ -53,35 +53,35 @@ Register-ArgumentCompleter -Native -CommandName 'peek' -ScriptBlock {
             [CompletionResult]::new('reload', 'reload', [CompletionResultType]::ParameterValue, 'reload')
             break
         }
-        'peek;edit;decrement' {
+        'hview;edit;decrement' {
             [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('-V', '-V ', [CompletionResultType]::ParameterName, 'Print version')
             [CompletionResult]::new('--version', '--version', [CompletionResultType]::ParameterName, 'Print version')
             break
         }
-        'peek;edit;delete' {
+        'hview;edit;delete' {
             [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('-V', '-V ', [CompletionResultType]::ParameterName, 'Print version')
             [CompletionResult]::new('--version', '--version', [CompletionResultType]::ParameterName, 'Print version')
             break
         }
-        'peek;edit;increment' {
+        'hview;edit;increment' {
             [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('-V', '-V ', [CompletionResultType]::ParameterName, 'Print version')
             [CompletionResult]::new('--version', '--version', [CompletionResultType]::ParameterName, 'Print version')
             break
         }
-        'peek;edit;reload' {
+        'hview;edit;reload' {
             [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('-V', '-V ', [CompletionResultType]::ParameterName, 'Print version')
             [CompletionResult]::new('--version', '--version', [CompletionResultType]::ParameterName, 'Print version')
             break
         }
-        'peek;import' {
+        'hview;import' {
             [CompletionResult]::new('--merge', '--merge', [CompletionResultType]::ParameterName, 'Merge into existing database')
             [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help')
@@ -95,7 +95,7 @@ Register-ArgumentCompleter -Native -CommandName 'peek' -ScriptBlock {
             [CompletionResult]::new('zsh-z', 'zsh-z', [CompletionResultType]::ParameterValue, 'Import from zsh-z')
             break
         }
-        'peek;import;atuin' {
+        'hview;import;atuin' {
             [CompletionResult]::new('--merge', '--merge', [CompletionResultType]::ParameterName, 'Merge into existing database')
             [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help')
@@ -103,7 +103,7 @@ Register-ArgumentCompleter -Native -CommandName 'peek' -ScriptBlock {
             [CompletionResult]::new('--version', '--version', [CompletionResultType]::ParameterName, 'Print version')
             break
         }
-        'peek;import;autojump' {
+        'hview;import;autojump' {
             [CompletionResult]::new('--merge', '--merge', [CompletionResultType]::ParameterName, 'Merge into existing database')
             [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help')
@@ -111,7 +111,7 @@ Register-ArgumentCompleter -Native -CommandName 'peek' -ScriptBlock {
             [CompletionResult]::new('--version', '--version', [CompletionResultType]::ParameterName, 'Print version')
             break
         }
-        'peek;import;fasd' {
+        'hview;import;fasd' {
             [CompletionResult]::new('--merge', '--merge', [CompletionResultType]::ParameterName, 'Merge into existing database')
             [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help')
@@ -119,7 +119,7 @@ Register-ArgumentCompleter -Native -CommandName 'peek' -ScriptBlock {
             [CompletionResult]::new('--version', '--version', [CompletionResultType]::ParameterName, 'Print version')
             break
         }
-        'peek;import;z' {
+        'hview;import;z' {
             [CompletionResult]::new('--merge', '--merge', [CompletionResultType]::ParameterName, 'Merge into existing database')
             [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help')
@@ -127,7 +127,7 @@ Register-ArgumentCompleter -Native -CommandName 'peek' -ScriptBlock {
             [CompletionResult]::new('--version', '--version', [CompletionResultType]::ParameterName, 'Print version')
             break
         }
-        'peek;import;z.lua' {
+        'hview;import;z.lua' {
             [CompletionResult]::new('--merge', '--merge', [CompletionResultType]::ParameterName, 'Merge into existing database')
             [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help')
@@ -135,7 +135,7 @@ Register-ArgumentCompleter -Native -CommandName 'peek' -ScriptBlock {
             [CompletionResult]::new('--version', '--version', [CompletionResultType]::ParameterName, 'Print version')
             break
         }
-        'peek;import;zsh-z' {
+        'hview;import;zsh-z' {
             [CompletionResult]::new('--merge', '--merge', [CompletionResultType]::ParameterName, 'Merge into existing database')
             [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help')
@@ -143,17 +143,17 @@ Register-ArgumentCompleter -Native -CommandName 'peek' -ScriptBlock {
             [CompletionResult]::new('--version', '--version', [CompletionResultType]::ParameterName, 'Print version')
             break
         }
-        'peek;init' {
-            [CompletionResult]::new('--cmd', '--cmd', [CompletionResultType]::ParameterName, 'Changes the prefix of the `p` and `pi` commands')
-            [CompletionResult]::new('--hook', '--hook', [CompletionResultType]::ParameterName, 'Changes how often peek increments a directory''s score')
-            [CompletionResult]::new('--no-cmd', '--no-cmd', [CompletionResultType]::ParameterName, 'Prevents peek from defining the `p` and `pi` commands')
+        'hview;init' {
+            [CompletionResult]::new('--cmd', '--cmd', [CompletionResultType]::ParameterName, 'Changes the prefix of the `h` and `hi` commands')
+            [CompletionResult]::new('--hook', '--hook', [CompletionResultType]::ParameterName, 'Changes how often hview increments a directory''s score')
+            [CompletionResult]::new('--no-cmd', '--no-cmd', [CompletionResultType]::ParameterName, 'Prevents hview from defining the `h` and `hi` commands')
             [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('-V', '-V ', [CompletionResultType]::ParameterName, 'Print version')
             [CompletionResult]::new('--version', '--version', [CompletionResultType]::ParameterName, 'Print version')
             break
         }
-        'peek;query' {
+        'hview;query' {
             [CompletionResult]::new('--exclude', '--exclude', [CompletionResultType]::ParameterName, 'Exclude the current directory')
             [CompletionResult]::new('--base-dir', '--base-dir', [CompletionResultType]::ParameterName, 'Only search within this directory')
             [CompletionResult]::new('-a', '-a', [CompletionResultType]::ParameterName, 'Show unavailable directories')
@@ -170,7 +170,7 @@ Register-ArgumentCompleter -Native -CommandName 'peek' -ScriptBlock {
             [CompletionResult]::new('--version', '--version', [CompletionResultType]::ParameterName, 'Print version')
             break
         }
-        'peek;remove' {
+        'hview;remove' {
             [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('-V', '-V ', [CompletionResultType]::ParameterName, 'Print version')

@@ -64,9 +64,9 @@ coverage/
 *.save
 
 # Installer temporary files
-peek
-peek.exe
+hview
+hview.exe
 package
 *.tar.gz
 *.zip
-/tmp/peek_*
+/tmp/hview_*

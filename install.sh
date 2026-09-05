@@ -7,7 +7,7 @@ if [ -z "$TERM" ]; then
 fi
 
 clear
-echo -e "\033[34mpeek installer\033[0m"
+echo -e "\033[34mhview installer\033[0m"
 echo -e "\033[34m==============\033[0m"
 echo -e "\033[34mby execRooted\033[0m"
 echo ""
@@ -77,12 +77,12 @@ _arch="$(get_architecture)" || err "failed to detect architecture"
 info "Detected architecture: ${_arch}"
 
 case "${_arch}" in
-    *windows*) _bin_name="peek.exe" ;;
-    *)         _bin_name="peek" ;;
+    *windows*) _bin_name="hview.exe" ;;
+    *)         _bin_name="hview" ;;
 esac
 
 info "Fetching latest release from GitHub..."
-_releases_url="https://api.github.com/repos/execRooted/peek/releases/latest"
+_releases_url="https://api.github.com/repos/execRooted/hview/releases/latest"
 
 case "${_dld}" in
     curl) _releases="$(curl -sL "${_releases_url}")" ;;
@@ -94,10 +94,10 @@ if echo "${_releases}" | grep -q 'API rate limit exceeded'; then
 fi
 
 _package_url="$(echo "${_releases}" | grep "browser_download_url" | cut -d '"' -f 4 | grep "${_arch}")" || \
-    err "peek has not yet been packaged for your architecture (${_arch})"
+    err "hview has not yet been packaged for your architecture (${_arch})"
 
 info "Downloading package..."
-_tmp_dir="$(mktemp -d /tmp/peek_XXXXXX)"
+_tmp_dir="$(mktemp -d /tmp/hview_XXXXXX)"
 cd "${_tmp_dir}"
 
 case "${_dld}" in
@@ -117,7 +117,7 @@ if [ ! -d "$INSTALL_DIR" ]; then
     mkdir -p "$INSTALL_DIR"
 fi
 
-info "Installing peek to ${INSTALL_DIR}..."
+info "Installing hview to ${INSTALL_DIR}..."
 cp -f "${_bin_name}" "${INSTALL_DIR}/${_bin_name}"
 chmod +x "${INSTALL_DIR}/${_bin_name}"
 
@@ -125,8 +125,8 @@ cd - >/dev/null
 rm -rf "${_tmp_dir}"
 
 success "Installation complete!"
-info "You can now run 'peek' from anywhere."
+info "You can now run 'hview' from anywhere."
 echo ""
-echo -e "\033[1;33m[USAGE]\033[0m To run the tool, simply type: peek"
-echo -e "\033[1;33m[USAGE]\033[0m For help run: peek -h"
+echo -e "\033[1;33m[USAGE]\033[0m To run the tool, simply type: hview"
+echo -e "\033[1;33m[USAGE]\033[0m For help run: hview -h"
 echo ""

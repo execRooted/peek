@@ -1,4 +1,4 @@
-_peek() {
+_hview() {
     local i cur prev opts cmd
     COMPREPLY=()
     if [[ "${BASH_VERSINFO[0]}" -ge 4 ]]; then
@@ -14,55 +14,55 @@ _peek() {
     do
         case "${cmd},${i}" in
             ",$1")
-                cmd="peek"
+                cmd="hview"
                 ;;
-            peek,add)
-                cmd="peek__subcmd__add"
+            hview,add)
+                cmd="hview__subcmd__add"
                 ;;
-            peek,edit)
-                cmd="peek__subcmd__edit"
+            hview,edit)
+                cmd="hview__subcmd__edit"
                 ;;
-            peek,import)
-                cmd="peek__subcmd__import"
+            hview,import)
+                cmd="hview__subcmd__import"
                 ;;
-            peek,init)
-                cmd="peek__subcmd__init"
+            hview,init)
+                cmd="hview__subcmd__init"
                 ;;
-            peek,query)
-                cmd="peek__subcmd__query"
+            hview,query)
+                cmd="hview__subcmd__query"
                 ;;
-            peek,remove)
-                cmd="peek__subcmd__remove"
+            hview,remove)
+                cmd="hview__subcmd__remove"
                 ;;
-            peek__subcmd__edit,decrement)
-                cmd="peek__subcmd__edit__subcmd__decrement"
+            hview__subcmd__edit,decrement)
+                cmd="hview__subcmd__edit__subcmd__decrement"
                 ;;
-            peek__subcmd__edit,delete)
-                cmd="peek__subcmd__edit__subcmd__delete"
+            hview__subcmd__edit,delete)
+                cmd="hview__subcmd__edit__subcmd__delete"
                 ;;
-            peek__subcmd__edit,increment)
-                cmd="peek__subcmd__edit__subcmd__increment"
+            hview__subcmd__edit,increment)
+                cmd="hview__subcmd__edit__subcmd__increment"
                 ;;
-            peek__subcmd__edit,reload)
-                cmd="peek__subcmd__edit__subcmd__reload"
+            hview__subcmd__edit,reload)
+                cmd="hview__subcmd__edit__subcmd__reload"
                 ;;
-            peek__subcmd__import,atuin)
-                cmd="peek__subcmd__import__subcmd__atuin"
+            hview__subcmd__import,atuin)
+                cmd="hview__subcmd__import__subcmd__atuin"
                 ;;
-            peek__subcmd__import,autojump)
-                cmd="peek__subcmd__import__subcmd__autojump"
+            hview__subcmd__import,autojump)
+                cmd="hview__subcmd__import__subcmd__autojump"
                 ;;
-            peek__subcmd__import,fasd)
-                cmd="peek__subcmd__import__subcmd__fasd"
+            hview__subcmd__import,fasd)
+                cmd="hview__subcmd__import__subcmd__fasd"
                 ;;
-            peek__subcmd__import,z)
-                cmd="peek__subcmd__import__subcmd__z"
+            hview__subcmd__import,z)
+                cmd="hview__subcmd__import__subcmd__z"
                 ;;
-            peek__subcmd__import,z.lua)
-                cmd="peek__subcmd__import__subcmd__z.lua"
+            hview__subcmd__import,z.lua)
+                cmd="hview__subcmd__import__subcmd__z.lua"
                 ;;
-            peek__subcmd__import,zsh-z)
-                cmd="peek__subcmd__import__subcmd__zsh__subcmd__z"
+            hview__subcmd__import,zsh-z)
+                cmd="hview__subcmd__import__subcmd__zsh__subcmd__z"
                 ;;
             *)
                 ;;
@@ -70,7 +70,7 @@ _peek() {
     done
 
     case "${cmd}" in
-        peek)
+        hview)
             opts="-h -V --help --version add edit import init query remove"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
@@ -84,7 +84,7 @@ _peek() {
             COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
             return 0
             ;;
-        peek__subcmd__add)
+        hview__subcmd__add)
             opts="-s -h -V --score --help --version <PATHS>..."
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
@@ -106,7 +106,7 @@ _peek() {
             COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
             return 0
             ;;
-        peek__subcmd__edit)
+        hview__subcmd__edit)
             opts="-h -V --help --version decrement delete increment reload"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
@@ -120,7 +120,7 @@ _peek() {
             COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
             return 0
             ;;
-        peek__subcmd__edit__subcmd__decrement)
+        hview__subcmd__edit__subcmd__decrement)
             opts="-h -V --help --version <PATH>"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
@@ -134,7 +134,7 @@ _peek() {
             COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
             return 0
             ;;
-        peek__subcmd__edit__subcmd__delete)
+        hview__subcmd__edit__subcmd__delete)
             opts="-h -V --help --version <PATH>"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
@@ -148,7 +148,7 @@ _peek() {
             COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
             return 0
             ;;
-        peek__subcmd__edit__subcmd__increment)
+        hview__subcmd__edit__subcmd__increment)
             opts="-h -V --help --version <PATH>"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
@@ -162,7 +162,7 @@ _peek() {
             COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
             return 0
             ;;
-        peek__subcmd__edit__subcmd__reload)
+        hview__subcmd__edit__subcmd__reload)
             opts="-h -V --help --version"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
@@ -176,7 +176,7 @@ _peek() {
             COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
             return 0
             ;;
-        peek__subcmd__import)
+        hview__subcmd__import)
             opts="-h -V --merge --help --version atuin autojump fasd z z.lua zsh-z"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
@@ -190,7 +190,7 @@ _peek() {
             COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
             return 0
             ;;
-        peek__subcmd__import__subcmd__atuin)
+        hview__subcmd__import__subcmd__atuin)
             opts="-h -V --merge --help --version"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
@@ -204,7 +204,7 @@ _peek() {
             COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
             return 0
             ;;
-        peek__subcmd__import__subcmd__autojump)
+        hview__subcmd__import__subcmd__autojump)
             opts="-h -V --merge --help --version"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
@@ -218,7 +218,7 @@ _peek() {
             COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
             return 0
             ;;
-        peek__subcmd__import__subcmd__fasd)
+        hview__subcmd__import__subcmd__fasd)
             opts="-h -V --merge --help --version"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
@@ -232,7 +232,7 @@ _peek() {
             COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
             return 0
             ;;
-        peek__subcmd__import__subcmd__z)
+        hview__subcmd__import__subcmd__z)
             opts="-h -V --merge --help --version"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
@@ -246,7 +246,7 @@ _peek() {
             COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
             return 0
             ;;
-        peek__subcmd__import__subcmd__z.lua)
+        hview__subcmd__import__subcmd__z.lua)
             opts="-h -V --merge --help --version"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
@@ -260,7 +260,7 @@ _peek() {
             COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
             return 0
             ;;
-        peek__subcmd__import__subcmd__zsh__subcmd__z)
+        hview__subcmd__import__subcmd__zsh__subcmd__z)
             opts="-h -V --merge --help --version"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
@@ -274,7 +274,7 @@ _peek() {
             COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
             return 0
             ;;
-        peek__subcmd__init)
+        hview__subcmd__init)
             opts="-h -V --no-cmd --cmd --hook --help --version bash elvish fish nushell posix powershell tcsh xonsh zsh"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
@@ -296,7 +296,7 @@ _peek() {
             COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
             return 0
             ;;
-        peek__subcmd__query)
+        hview__subcmd__query)
             opts="-a -i -l -s -h -V --all --interactive --list --score --exclude --base-dir --help --version [KEYWORDS]..."
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
@@ -324,7 +324,7 @@ _peek() {
             COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
             return 0
             ;;
-        peek__subcmd__remove)
+        hview__subcmd__remove)
             opts="-h -V --help --version [PATHS]..."
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
@@ -342,7 +342,7 @@ _peek() {
 }
 
 if [[ "${BASH_VERSINFO[0]}" -eq 4 && "${BASH_VERSINFO[1]}" -ge 4 || "${BASH_VERSINFO[0]}" -gt 4 ]]; then
-    complete -F _peek -o nosort -o bashdefault -o default peek
+    complete -F _hview -o nosort -o bashdefault -o default hview
 else
-    complete -F _peek -o bashdefault -o default peek
+    complete -F _hview -o bashdefault -o default hview
 fi

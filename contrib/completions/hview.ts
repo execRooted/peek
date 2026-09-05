@@ -1,6 +1,6 @@
 const completion: Fig.Spec = {
-  name: "peek",
-  description: "A smarter ls command for your terminal",
+  name: "hview",
+  description: "hop view — a smarter ls command for your terminal",
   subcommands: [
     {
       name: "add",
@@ -245,7 +245,7 @@ const completion: Fig.Spec = {
       options: [
         {
           name: "--cmd",
-          description: "Changes the prefix of the `p` and `pi` commands",
+          description: "Changes the prefix of the `h` and `hi` commands",
           isRepeatable: true,
           args: {
             name: "cmd",
@@ -254,7 +254,7 @@ const completion: Fig.Spec = {
         },
         {
           name: "--hook",
-          description: "Changes how often peek increments a directory's score",
+          description: "Changes how often hview increments a directory's score",
           isRepeatable: true,
           args: {
             name: "hook",
@@ -268,7 +268,7 @@ const completion: Fig.Spec = {
         },
         {
           name: "--no-cmd",
-          description: "Prevents peek from defining the `p` and `pi` commands",
+          description: "Prevents hview from defining the `h` and `hi` commands",
         },
         {
           name: ["-h", "--help"],

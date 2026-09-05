@@ -1,5 +1,5 @@
-if command -sq peek
-    peek init fish | source
+if command -sq hview
+    hview init fish | source
 else
-    echo 'peek: command not found, please install it from https://github.com/execRooted/peek'
+    echo 'hview: command not found, please install it from https://github.com/execRooted/hview'
 end

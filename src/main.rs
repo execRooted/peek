@@ -27,7 +27,7 @@ pub fn main() -> ExitCode {
         Err(e) => match e.downcast::<SilentExit>() {
             Ok(SilentExit { code }) => code.into(),
             Err(e) => {
-                _ = writeln!(io::stderr(), "peek: {e:?}");
+                _ = writeln!(io::stderr(), "hview: {e:?}");
                 ExitCode::FAILURE
             }
         },

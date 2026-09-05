@@ -1,14 +1,14 @@
 [package]
 authors = ["execRooted"]
 categories = ["command-line-utilities", "filesystem"]
-description = "A smarter ls command for your terminal"
+description = "hop view — a smarter ls command for your terminal"
 edition = "2024"
-homepage = "https://github.com/execRooted/peek"
+homepage = "https://github.com/execRooted/hview"
 keywords = ["cli", "filesystem", "shell", "tool", "utility"]
 license = "MIT"
-name = "peek"
+name = "hview"
 readme = "README.md"
-repository = "https://github.com/execRooted/peek"
+repository = "https://github.com/execRooted/hview"
 rust-version = "1.88.0"
 version = "1.0.0"
 
@@ -61,22 +61,22 @@ strip = true
 [package.metadata.deb]
 assets = [
     [
-        "target/release/peek",
+        "target/release/hview",
         "usr/bin/",
         "755",
     ],
     [
-        "contrib/completions/peek.bash",
-        "usr/share/bash-completion/completions/peek",
+        "contrib/completions/hview.bash",
+        "usr/share/bash-completion/completions/hview",
         "644",
     ],
     [
-        "contrib/completions/peek.fish",
+        "contrib/completions/hview.fish",
         "usr/share/fish/vendor_completions.d/",
         "664",
     ],
     [
-        "contrib/completions/_peek",
+        "contrib/completions/_hview",
         "usr/share/zsh/vendor-completions/",
         "644",
     ],
@@ -87,22 +87,22 @@ assets = [
     ],
     [
         "README.md",
-        "usr/share/doc/peek/",
+        "usr/share/doc/hview/",
         "644",
     ],
     [
         "CHANGELOG.md",
-        "usr/share/doc/peek/",
+        "usr/share/doc/hview/",
         "644",
     ],
     [
         "LICENSE",
-        "usr/share/doc/peek/",
+        "usr/share/doc/hview/",
         "644",
     ],
 ]
 extended-description = """\
-peek is a smarter ls command, inspired by z and autojump. It remembers which \
+hview (hop view) is a smarter ls command, inspired by z and autojump. It remembers which \
 directories you use most frequently, so you can "jump" to them in just a few \
 keystrokes."""
 priority = "optional"

@@ -5,11 +5,11 @@ use builtin
 use path
 
 {{ section }}
-# Utility functions for peek.
+# Utility functions for hview.
 #
 
-# ls + custom logic based on the value of _PEEK_ECHO.
-fn __peek_ls {|path|
+# ls + custom logic based on the value of _HVIEW_ECHO.
+fn __hview_ls {|path|
     builtin:ls $path
 {%- if echo %}
     builtin:echo $pwd
@@ -17,35 +17,35 @@ fn __peek_ls {|path|
 }
 
 {{ section }}
-# Hook configuration for peek.
+# Hook configuration for hview.
 #
 
 # Initialize hook to track previous directory.
 var oldpwd = $builtin:pwd
 set builtin:before-chdir = [$@builtin:before-chdir {|_| set oldpwd = $builtin:pwd }]
 
-# Initialize hook to add directories to peek.
+# Initialize hook to add directories to hview.
 {%- if hook == InitHook::None %}
 {{ not_configured }}
 
 {%- else %}
-if (builtin:not (builtin:eq $E:__peek_shlvl $E:SHLVL)) {
-    set E:__peek_shlvl = $E:SHLVL
+if (builtin:not (builtin:eq $E:__hview_shlvl $E:SHLVL)) {
+    set E:__hview_shlvl = $E:SHLVL
 {%- if hook == InitHook::Prompt %}
-    set edit:before-readline = [$@edit:before-readline {|| peek add -- $pwd }]
+    set edit:before-readline = [$@edit:before-readline {|| hview add -- $pwd }]
 {%- else if hook == InitHook::Pwd %}
-    set builtin:after-chdir = [$@builtin:after-chdir {|_| peek add -- $pwd }]
+    set builtin:after-chdir = [$@builtin:after-chdir {|_| hview add -- $pwd }]
 {%- endif %}
 }
 
 {%- endif %}
 
 {{ section }}
-# When using peek with --no-cmd, alias these internal functions as desired.
+# When using hview with --no-cmd, alias these internal functions as desired.
 #
 
 # Jump to a directory using only keywords.
-fn __peek_p {|@rest|
+fn __hview_h {|@rest|
     if (builtin:eq [] $rest) {
         ls ~
     } elif (builtin:eq [-] $rest) {
@@ -55,43 +55,43 @@ fn __peek_p {|@rest|
     } else {
         var path
         try {
-            set path = (peek query --exclude $pwd -- $@rest)
+            set path = (hview query --exclude $pwd -- $@rest)
         } catch {
         } else {
             ls $path
         }
     }
 }
-edit:add-var __peek_p~ $__peek_p~
+edit:add-var __hview_h~ $__hview_h~
 
 # Jump to a directory using interactive search.
-fn __peek_pi {|@rest|
+fn __hview_hi {|@rest|
     var path
     try {
-        set path = (peek query --interactive -- $@rest)
+        set path = (hview query --interactive -- $@rest)
     } catch {
     } else {
         ls $path
     }
 }
-edit:add-var __peek_pi~ $__peek_pi~
+edit:add-var __hview_hi~ $__hview_hi~
 
 {{ section }}
-# Commands for peek. Disable these using --no-cmd.
+# Commands for hview. Disable these using --no-cmd.
 #
 
 {%- match cmd %}
 {%- when Some with (cmd) %}
 
-edit:add-var {{cmd}}~ $__peek_p~
-edit:add-var {{cmd}}i~ $__peek_pi~
+edit:add-var {{cmd}}~ $__hview_h~
+edit:add-var {{cmd}}i~ $__hview_hi~
 
 # Load completions.
 {#-
-  peek-based completions are currently not possible, because Elvish only prints
+  hview-based completions are currently not possible, because Elvish only prints
   a completion if the current token is a prefix of it.
 #}
-fn __peek_p_complete {|@rest|
+fn __hview_h_complete {|@rest|
     if (!= (builtin:count $rest) 2) {
         builtin:return
     }
@@ -103,7 +103,7 @@ fn __peek_p_complete {|@rest|
             }
         }
 }
-set edit:completion:arg-completer[{{cmd}}] = $__peek_p_complete~
+set edit:completion:arg-completer[{{cmd}}] = $__hview_h_complete~
 
 {%- when None %}
 
@@ -112,9 +112,9 @@ set edit:completion:arg-completer[{{cmd}}] = $__peek_p_complete~
 {%- endmatch %}
 
 {{ section }}
-# To initialize peek, add this to your configuration (usually
+# To initialize hview, add this to your configuration (usually
 # ~/.elvish/rc.elv):
 #
-#   eval (peek init elvish | slurp)
+#   eval (hview init elvish | slurp)
 #
-# Note: peek only supports elvish v0.18.0 and above.
+# Note: hview only supports elvish v0.18.0 and above.

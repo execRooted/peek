@@ -8,28 +8,28 @@ use glob::Pattern;
 use crate::db::Rank;
 
 pub fn data_dir() -> Result<PathBuf> {
-    let dir = match env::var_os("_PEEK_DATA_DIR") {
+    let dir = match env::var_os("_HVIEW_DATA_DIR") {
         Some(path) => PathBuf::from(path),
         None => dirs::data_local_dir()
-            .context("could not find data directory, please set _PEEK_DATA_DIR manually")?
-            .join("peek"),
+            .context("could not find data directory, please set _HVIEW_DATA_DIR manually")?
+            .join("hview"),
     };
 
-    ensure!(dir.is_absolute(), "_PEEK_DATA_DIR must be an absolute path");
+    ensure!(dir.is_absolute(), "_HVIEW_DATA_DIR must be an absolute path");
     Ok(dir)
 }
 
 pub fn echo() -> bool {
-    env::var_os("_PEEK_ECHO").is_some_and(|var| var == "1")
+    env::var_os("_HVIEW_ECHO").is_some_and(|var| var == "1")
 }
 
 pub fn exclude_dirs() -> Result<Vec<Pattern>> {
-    match env::var_os("_PEEK_EXCLUDE_DIRS") {
+    match env::var_os("_HVIEW_EXCLUDE_DIRS") {
         Some(paths) => env::split_paths(&paths)
             .map(|path| {
-                let pattern = path.to_str().context("invalid unicode in _PEEK_EXCLUDE_DIRS")?;
+                let pattern = path.to_str().context("invalid unicode in _HVIEW_EXCLUDE_DIRS")?;
                 Pattern::new(pattern)
-                    .with_context(|| format!("invalid glob in _PEEK_EXCLUDE_DIRS: {pattern}"))
+                    .with_context(|| format!("invalid glob in _HVIEW_EXCLUDE_DIRS: {pattern}"))
             })
             .collect(),
         None => {
@@ -44,19 +44,19 @@ pub fn exclude_dirs() -> Result<Vec<Pattern>> {
 }
 
 pub fn fzf_opts() -> Option<OsString> {
-    env::var_os("_PEEK_FZF_OPTS")
+    env::var_os("_HVIEW_FZF_OPTS")
 }
 
 pub fn maxage() -> Result<Rank> {
-    env::var_os("_PEEK_MAXAGE").map_or(Ok(10_000.0), |maxage| {
-        let maxage = maxage.to_str().context("invalid unicode in _PEEK_MAXAGE")?;
+    env::var_os("_HVIEW_MAXAGE").map_or(Ok(10_000.0), |maxage| {
+        let maxage = maxage.to_str().context("invalid unicode in _HVIEW_MAXAGE")?;
         let maxage = maxage
             .parse::<u32>()
-            .with_context(|| format!("unable to parse _PEEK_MAXAGE as integer: {maxage}"))?;
+            .with_context(|| format!("unable to parse _HVIEW_MAXAGE as integer: {maxage}"))?;
         Ok(maxage as Rank)
     })
 }
 
 pub fn resolve_symlinks() -> bool {
-    env::var_os("_PEEK_RESOLVE_SYMLINKS").is_some_and(|var| var == "1")
+    env::var_os("_HVIEW_RESOLVE_SYMLINKS").is_some_and(|var| var == "1")
 }

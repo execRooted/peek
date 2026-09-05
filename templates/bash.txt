@@ -4,11 +4,11 @@
 # shellcheck shell=bash
 
 {{ section }}
-# Utility functions for peek.
+# Utility functions for hview.
 #
 
-# pwd based on the value of _PEEK_RESOLVE_SYMLINKS.
-function __peek_pwd() {
+# pwd based on the value of _HVIEW_RESOLVE_SYMLINKS.
+function __hview_pwd() {
 {%- decl pwd -%}
 {%- if resolve_symlinks -%}
 {%- let pwd = "\\builtin pwd -P" -%}
@@ -22,39 +22,39 @@ function __peek_pwd() {
 {%- endif %}
 }
 
-# ls + custom logic based on the value of _PEEK_ECHO.
-function __peek_ls() {
+# ls + custom logic based on the value of _HVIEW_ECHO.
+function __hview_ls() {
     # shellcheck disable=SC2164
-    \command ls -- "$@" {%- if echo %} && __peek_pwd {%- endif %}
+    \command ls -- "$@" {%- if echo %} && __hview_pwd {%- endif %}
 }
 
 {{ section }}
-# Hook configuration for peek.
+# Hook configuration for hview.
 #
 {%- if hook != InitHook::None %}
 
 # Hook to add new entries to the database.
 {%- if hook == InitHook::Prompt %}
-function __peek_hook() {
+function __hview_hook() {
     \builtin local -r retval="$?"
     if [[ -o history ]]; then
         # shellcheck disable=SC2312
-        \command peek add -- "$(__peek_pwd)"
+        \command hview add -- "$(__hview_pwd)"
     fi
     return "${retval}"
 }
 
 {%- else if hook == InitHook::Pwd %}
-__peek_oldpwd="$(__peek_pwd)"
+__hview_oldpwd="$(__hview_pwd)"
 
-function __peek_hook() {
+function __hview_hook() {
     \builtin local -r retval="$?"
     \builtin local pwd_tmp
-    pwd_tmp="$(__peek_pwd)"
-    if [[ ${__peek_oldpwd} != "${pwd_tmp}" ]]; then
-        __peek_oldpwd="${pwd_tmp}"
+    pwd_tmp="$(__hview_pwd)"
+    if [[ ${__hview_oldpwd} != "${pwd_tmp}" ]]; then
+        __hview_oldpwd="${pwd_tmp}"
         if [[ -o history ]]; then
-            \command peek add -- "${__peek_oldpwd}"
+            \command hview add -- "${__hview_oldpwd}"
         fi
     fi
     return "${retval}"
@@ -62,53 +62,53 @@ function __peek_hook() {
 {%- endif %}
 
 # Initialize hook.
-if [[ ${PROMPT_COMMAND:=} != *'__peek_hook'* ]]; then
+if [[ ${PROMPT_COMMAND:=} != *'__hview_hook'* ]]; then
     if [[ "$(declare -p PROMPT_COMMAND 2>&1)" == "declare -a"* ]]; then
-        PROMPT_COMMAND=("${PROMPT_COMMAND[@]}" __peek_hook)
+        PROMPT_COMMAND=("${PROMPT_COMMAND[@]}" __hview_hook)
     else
         # shellcheck disable=SC2128,SC2178
         PROMPT_COMMAND="${PROMPT_COMMAND%"${PROMPT_COMMAND##*[![:space:];]}"}"
         # shellcheck disable=SC2128,SC2178
-        PROMPT_COMMAND="${PROMPT_COMMAND:+${PROMPT_COMMAND};}__peek_hook"
+        PROMPT_COMMAND="${PROMPT_COMMAND:+${PROMPT_COMMAND};}__hview_hook"
     fi
 fi
 
 {%- endif %}
 
 # Report common issues.
-function __peek_doctor() {
+function __hview_doctor() {
 {%- if hook == InitHook::None %}
     return 0
 
 {%- else %}
-    [[ ${_PEEK_DOCTOR:-1} -eq 0 ]] && return 0
+    [[ ${_HVIEW_DOCTOR:-1} -eq 0 ]] && return 0
     # shellcheck disable=SC2199
-    [[ ${PROMPT_COMMAND[@]:-} == *'__peek_hook'* ]] && return 0
+    [[ ${PROMPT_COMMAND[@]:-} == *'__hview_hook'* ]] && return 0
     # shellcheck disable=SC2199
-    [[ ${__vsc_original_prompt_command[@]:-} == *'__peek_hook'* ]] && return 0
+    [[ ${__vsc_original_prompt_command[@]:-} == *'__hview_hook'* ]] && return 0
 
-    _PEEK_DOCTOR=0
+    _HVIEW_DOCTOR=0
     \builtin printf '%s\n' \
-        'peek: detected a possible configuration issue.' \
-        'Please ensure that peek is initialized right at the end of your shell configuration file (usually ~/.bashrc).' \
+        'hview: detected a possible configuration issue.' \
+        'Please ensure that hview is initialized right at the end of your shell configuration file (usually ~/.bashrc).' \
         '' \
         'If the issue persists, consider filing an issue at:' \
-        'https://github.com/execRooted/peek/issues' \
+        'https://github.com/execRooted/hview/issues' \
         '' \
-        'Disable this message by setting _PEEK_DOCTOR=0.' \
+        'Disable this message by setting _HVIEW_DOCTOR=0.' \
         '' >&2
 {%- endif %}
 }
 
 {{ section }}
-# When using peek with --no-cmd, alias these internal functions as desired.
+# When using hview with --no-cmd, alias these internal functions as desired.
 #
 
-__peek_p_prefix='p#'
+__hview_h_prefix='h#'
 
 # Jump to a directory using only keywords.
-function __peek_p() {
-    __peek_doctor
+function __hview_h() {
+    __hview_doctor
 
     # shellcheck disable=SC2199
     if [[ $# -eq 0 ]]; then
@@ -119,27 +119,27 @@ function __peek_p() {
         ls "$1"
     elif [[ $# -eq 2 && $1 == '--' ]]; then
         ls "$2"
-    elif [[ ${@: -1} == "${__peek_p_prefix}"?* ]]; then
+    elif [[ ${@: -1} == "${__hview_h_prefix}"?* ]]; then
         # shellcheck disable=SC2124
         \builtin local result="${@: -1}"
-        ls "{{ "${result:${#__peek_p_prefix}}" }}"
+        ls "{{ "${result:${#__hview_h_prefix}}" }}"
     else
         \builtin local result
         # shellcheck disable=SC2312
-        result="$(\command peek query --exclude "$(__peek_pwd)" -- "$@")" &&
+        result="$(\command hview query --exclude "$(__hview_pwd)" -- "$@")" &&
             ls "${result}"
     fi
 }
 
 # Jump to a directory using interactive search.
-function __peek_pi() {
-    __peek_doctor
+function __hview_hi() {
+    __hview_doctor
     \builtin local result
-    result="$(\command peek query --interactive -- "$@")" && ls "${result}"
+    result="$(\command hview query --interactive -- "$@")" && ls "${result}"
 }
 
 {{ section }}
-# Commands for peek. Disable these using --no-cmd.
+# Commands for hview. Disable these using --no-cmd.
 #
 
 {%- match cmd %}
@@ -147,12 +147,12 @@ function __peek_pi() {
 
 \builtin unalias {{cmd}} &>/dev/null || \builtin true
 function {{cmd}}() {
-    __peek_p "$@"
+    __hview_h "$@"
 }
 
 \builtin unalias {{cmd}}i &>/dev/null || \builtin true
 function {{cmd}}i() {
-    __peek_pi "$@"
+    __hview_hi "$@"
 }
 
 # Load completions.
@@ -163,14 +163,14 @@ function {{cmd}}i() {
 if [[ ${BASH_VERSINFO[0]:-0} -eq 4 && ${BASH_VERSINFO[1]:-0} -ge 4 || ${BASH_VERSINFO[0]:-0} -ge 5 ]] &&
     [[ :"${SHELLOPTS}": =~ :(vi|emacs): && ${TERM} != 'dumb' ]]; then
 
-    function __peek_p_complete_helper() {
-        READLINE_LINE="{{ cmd }} ${__peek_result@Q}"
+    function __hview_h_complete_helper() {
+        READLINE_LINE="{{ cmd }} ${__hview_result@Q}"
         READLINE_POINT={{ "${#READLINE_LINE}" }}
         bind '"\e[0n": accept-line'
         \builtin printf '\e[5n' >/dev/tty
     }
 
-    function __peek_p_complete() {
+    function __hview_h_complete() {
         # Only show completions when the cursor is at the end of the line.
         [[ {{ "${#COMP_WORDS[@]}" }} -eq $((COMP_CWORD + 1)) ]] || return
 
@@ -182,16 +182,16 @@ if [[ ${BASH_VERSINFO[0]:-0} -eq 4 && ${BASH_VERSINFO[1]:-0} -ge 4 || ${BASH_VER
         # If there is a space after the last word, use interactive selection.
         elif [[ -z ${COMP_WORDS[-1]} ]]; then
             # shellcheck disable=SC2312
-            if __peek_result="$(\command peek query --exclude "$(__peek_pwd)" --interactive -- "{{ "${COMP_WORDS[@]:1:${#COMP_WORDS[@]}-2}" }}" 2>/dev/null)"; then
+            if __hview_result="$(\command hview query --exclude "$(__hview_pwd)" --interactive -- "{{ "${COMP_WORDS[@]:1:${#COMP_WORDS[@]}-2}" }}" 2>/dev/null)"; then
                 # In case the terminal does not respond to \e[0n or another
                 # mechanism steals the response, it is still worth completing
                 # the directory in the command line.
-                COMPREPLY=("${__peek_p_prefix}${__peek_result}/")
+                COMPREPLY=("${__hview_h_prefix}${__hview_result}/")
 
                 # Note: We here call "bind" without prefixing "\builtin" to be
                 # compatible with frameworks like ble.sh, which emulates Bash's
                 # builtin "bind".
-                bind -x '"\e[0n": __peek_p_complete_helper'
+                bind -x '"\e[0n": __hview_h_complete_helper'
                 \builtin printf '\e[5n' >/dev/tty
             else
                 # The interactive selection was cancelled. fzf has drawn over
@@ -202,7 +202,7 @@ if [[ ${BASH_VERSINFO[0]:-0} -eq 4 && ${BASH_VERSINFO[1]:-0} -ge 4 || ${BASH_VER
         fi
     }
 
-    \builtin complete -F __peek_p_complete -o filenames -- {{cmd}}
+    \builtin complete -F __hview_h_complete -o filenames -- {{cmd}}
     \builtin complete -r {{cmd}}i &>/dev/null || \builtin true
 fi
 
@@ -213,6 +213,6 @@ fi
 {%- endmatch %}
 
 {{ section }}
-# To initialize peek, add this to your shell configuration file (usually ~/.bashrc):
+# To initialize hview, add this to your shell configuration file (usually ~/.bashrc):
 #
-# eval "$(peek init bash)"
+# eval "$(hview init bash)"

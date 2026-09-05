@@ -2,14 +2,14 @@
 use builtin;
 use str;
 
-set edit:completion:arg-completer[peek] = {|@words|
+set edit:completion:arg-completer[hview] = {|@words|
     fn spaces {|n|
         builtin:repeat $n ' ' | str:join ''
     }
     fn cand {|text desc|
         edit:complex-candidate $text &display=$text' '(spaces (- 14 (wcswidth $text)))$desc
     }
-    var command = 'peek'
+    var command = 'hview'
     for word $words[1..-1] {
         if (str:has-prefix $word '-') {
             break
@@ -17,7 +17,7 @@ set edit:completion:arg-completer[peek] = {|@words|
         set command = $command';'$word
     }
     var completions = [
-        &'peek'= {
+        &'hview'= {
             cand -h 'Print help'
             cand --help 'Print help'
             cand -V 'Print version'
@@ -29,7 +29,7 @@ set edit:completion:arg-completer[peek] = {|@words|
             cand query 'Search for a directory in the database'
             cand remove 'Remove a directory from the database'
         }
-        &'peek;add'= {
+        &'hview;add'= {
             cand -s 'The rank to increment the entry if it exists or initialize it with if it doesn''t'
             cand --score 'The rank to increment the entry if it exists or initialize it with if it doesn''t'
             cand -h 'Print help'
@@ -37,7 +37,7 @@ set edit:completion:arg-completer[peek] = {|@words|
             cand -V 'Print version'
             cand --version 'Print version'
         }
-        &'peek;edit'= {
+        &'hview;edit'= {
             cand -h 'Print help'
             cand --help 'Print help'
             cand -V 'Print version'
@@ -47,31 +47,31 @@ set edit:completion:arg-completer[peek] = {|@words|
             cand increment 'increment'
             cand reload 'reload'
         }
-        &'peek;edit;decrement'= {
+        &'hview;edit;decrement'= {
             cand -h 'Print help'
             cand --help 'Print help'
             cand -V 'Print version'
             cand --version 'Print version'
         }
-        &'peek;edit;delete'= {
+        &'hview;edit;delete'= {
             cand -h 'Print help'
             cand --help 'Print help'
             cand -V 'Print version'
             cand --version 'Print version'
         }
-        &'peek;edit;increment'= {
+        &'hview;edit;increment'= {
             cand -h 'Print help'
             cand --help 'Print help'
             cand -V 'Print version'
             cand --version 'Print version'
         }
-        &'peek;edit;reload'= {
+        &'hview;edit;reload'= {
             cand -h 'Print help'
             cand --help 'Print help'
             cand -V 'Print version'
             cand --version 'Print version'
         }
-        &'peek;import'= {
+        &'hview;import'= {
             cand --merge 'Merge into existing database'
             cand -h 'Print help'
             cand --help 'Print help'
@@ -84,58 +84,58 @@ set edit:completion:arg-completer[peek] = {|@words|
             cand z.lua 'Import from z.lua'
             cand zsh-z 'Import from zsh-z'
         }
-        &'peek;import;atuin'= {
+        &'hview;import;atuin'= {
             cand --merge 'Merge into existing database'
             cand -h 'Print help'
             cand --help 'Print help'
             cand -V 'Print version'
             cand --version 'Print version'
         }
-        &'peek;import;autojump'= {
+        &'hview;import;autojump'= {
             cand --merge 'Merge into existing database'
             cand -h 'Print help'
             cand --help 'Print help'
             cand -V 'Print version'
             cand --version 'Print version'
         }
-        &'peek;import;fasd'= {
+        &'hview;import;fasd'= {
             cand --merge 'Merge into existing database'
             cand -h 'Print help'
             cand --help 'Print help'
             cand -V 'Print version'
             cand --version 'Print version'
         }
-        &'peek;import;z'= {
+        &'hview;import;z'= {
             cand --merge 'Merge into existing database'
             cand -h 'Print help'
             cand --help 'Print help'
             cand -V 'Print version'
             cand --version 'Print version'
         }
-        &'peek;import;z.lua'= {
+        &'hview;import;z.lua'= {
             cand --merge 'Merge into existing database'
             cand -h 'Print help'
             cand --help 'Print help'
             cand -V 'Print version'
             cand --version 'Print version'
         }
-        &'peek;import;zsh-z'= {
+        &'hview;import;zsh-z'= {
             cand --merge 'Merge into existing database'
             cand -h 'Print help'
             cand --help 'Print help'
             cand -V 'Print version'
             cand --version 'Print version'
         }
-        &'peek;init'= {
-            cand --cmd 'Changes the prefix of the `p` and `pi` commands'
-            cand --hook 'Changes how often peek increments a directory''s score'
-            cand --no-cmd 'Prevents peek from defining the `p` and `pi` commands'
+        &'hview;init'= {
+            cand --cmd 'Changes the prefix of the `h` and `hi` commands'
+            cand --hook 'Changes how often hview increments a directory''s score'
+            cand --no-cmd 'Prevents hview from defining the `h` and `hi` commands'
             cand -h 'Print help'
             cand --help 'Print help'
             cand -V 'Print version'
             cand --version 'Print version'
         }
-        &'peek;query'= {
+        &'hview;query'= {
             cand --exclude 'Exclude the current directory'
             cand --base-dir 'Only search within this directory'
             cand -a 'Show unavailable directories'
@@ -151,7 +151,7 @@ set edit:completion:arg-completer[peek] = {|@words|
             cand -V 'Print version'
             cand --version 'Print version'
         }
-        &'peek;remove'= {
+        &'hview;remove'= {
             cand -h 'Print help'
             cand --help 'Print help'
             cand -V 'Print version'

@@ -4,11 +4,11 @@
 # shellcheck shell=bash
 
 {{ section }}
-# Utility functions for peek.
+# Utility functions for hview.
 #
 
-# pwd based on the value of _PEEK_RESOLVE_SYMLINKS.
-function __peek_pwd() {
+# pwd based on the value of _HVIEW_RESOLVE_SYMLINKS.
+function __hview_pwd() {
 {%- decl pwd -%}
 {%- if resolve_symlinks -%}
 {%- let pwd = "\\builtin pwd -P" -%}
@@ -22,71 +22,71 @@ function __peek_pwd() {
 {%- endif %}
 }
 
-# ls + custom logic based on the value of _PEEK_ECHO.
-function __peek_ls() {
+# ls + custom logic based on the value of _HVIEW_ECHO.
+function __hview_ls() {
     # shellcheck disable=SC2164
-    \command ls -- "$@" {%- if echo %} && __peek_pwd {%- endif %}
+    \command ls -- "$@" {%- if echo %} && __hview_pwd {%- endif %}
 }
 
 {{ section }}
-# Hook configuration for peek.
+# Hook configuration for hview.
 #
 
 # Hook to add new entries to the database.
-function __peek_hook() {
+function __hview_hook() {
     # shellcheck disable=SC2312
-    \command peek add -- "$(__peek_pwd)"
+    \command hview add -- "$(__hview_pwd)"
 }
 
 # Initialize hook.
 \builtin typeset -ga precmd_functions
 \builtin typeset -ga chpwd_functions
 # shellcheck disable=SC2034,SC2296
-precmd_functions=("${(@)precmd_functions:#__peek_hook}")
+precmd_functions=("${(@)precmd_functions:#__hview_hook}")
 # shellcheck disable=SC2034,SC2296
-chpwd_functions=("${(@)chpwd_functions:#__peek_hook}")
+chpwd_functions=("${(@)chpwd_functions:#__hview_hook}")
 
 {%- if hook == InitHook::Prompt %}
-precmd_functions+=(__peek_hook)
+precmd_functions+=(__hview_hook)
 {%- else if hook == InitHook::Pwd %}
-chpwd_functions+=(__peek_hook)
+chpwd_functions+=(__hview_hook)
 {%- endif %}
 
 # Report common issues.
-function __peek_doctor() {
+function __hview_doctor() {
 {%- if hook == InitHook::None %}
     return 0
 
 {%- else %}
-    [[ ${_PEEK_DOCTOR:-1} -ne 0 ]] || return 0
+    [[ ${_HVIEW_DOCTOR:-1} -ne 0 ]] || return 0
     [[ $- == *i* ]] || return 0
 
 {%- if hook == InitHook::Prompt %}
-    [[ ${precmd_functions[(Ie)__peek_hook]:-} -eq 0 ]] || return 0
+    [[ ${precmd_functions[(Ie)__hview_hook]:-} -eq 0 ]] || return 0
 {%- else if hook == InitHook::Pwd %}
-    [[ ${chpwd_functions[(Ie)__peek_hook]:-} -eq 0 ]] || return 0
+    [[ ${chpwd_functions[(Ie)__hview_hook]:-} -eq 0 ]] || return 0
 {%- endif %}
 
-    _PEEK_DOCTOR=0
+    _HVIEW_DOCTOR=0
     \builtin printf '%s\n' \
-        'peek: detected a possible configuration issue.' \
-        'Please ensure that peek is initialized right at the end of your shell configuration file (usually ~/.zshrc).' \
+        'hview: detected a possible configuration issue.' \
+        'Please ensure that hview is initialized right at the end of your shell configuration file (usually ~/.zshrc).' \
         '' \
         'If the issue persists, consider filing an issue at:' \
-        'https://github.com/execRooted/peek/issues' \
+        'https://github.com/execRooted/hview/issues' \
         '' \
-        'Disable this message by setting _PEEK_DOCTOR=0.' \
+        'Disable this message by setting _HVIEW_DOCTOR=0.' \
         '' >&2
 {%- endif %}
 }
 
 {{ section }}
-# When using peek with --no-cmd, alias these internal functions as desired.
+# When using hview with --no-cmd, alias these internal functions as desired.
 #
 
 # Jump to a directory using only keywords.
-function __peek_p() {
-    __peek_doctor
+function __hview_h() {
+    __hview_doctor
     if [[ "$#" -eq 0 ]]; then
         ls ~
     elif [[ "$#" -eq 1 ]] && [[ "$1" = '-' ]]; then
@@ -98,30 +98,30 @@ function __peek_p() {
     else
         \builtin local result
         # shellcheck disable=SC2312
-        result="$(\command peek query --exclude "$(__peek_pwd)" -- "$@")" && ls "${result}"
+        result="$(\command hview query --exclude "$(__hview_pwd)" -- "$@")" && ls "${result}"
     fi
 }
 
 # Jump to a directory using interactive search.
-function __peek_pi() {
-    __peek_doctor
+function __hview_hi() {
+    __hview_doctor
     \builtin local result
-    result="$(\command peek query --interactive -- "$@")" && ls "${result}"
+    result="$(\command hview query --interactive -- "$@")" && ls "${result}"
 }
 
 {{ section }}
-# Commands for peek. Disable these using --no-cmd.
+# Commands for hview. Disable these using --no-cmd.
 #
 
 {%- match cmd %}
 {%- when Some with (cmd) %}
 
 function {{ cmd }}() {
-    __peek_p "$@"
+    __hview_h "$@"
 }
 
 function {{ cmd }}i() {
-    __peek_pi "$@"
+    __hview_hi "$@"
 }
 
 {%- when None %}
@@ -132,9 +132,9 @@ function {{ cmd }}i() {
 
 # Completions.
 if [[ -o zle ]]; then
-    __peek_result=''
+    __hview_result=''
 
-    function __peek_p_complete() {
+    function __hview_h_complete() {
         # Only show completions when the cursor is at the end of the line.
         # shellcheck disable=SC2154
         [[ "{{ "${#words[@]}" }}" -eq "${CURRENT}" ]] || return 0
@@ -146,13 +146,13 @@ if [[ -o zle ]]; then
         elif [[ "${words[-1]}" == '' ]]; then
             # Show completions for Space-Tab.
             # shellcheck disable=SC2086
-            __peek_result="$(\command peek query --exclude "$(__peek_pwd || \builtin true)" --interactive -- ${words[2,-1]} 2>/dev/null)" || __peek_result=''
+            __hview_result="$(\command hview query --exclude "$(__hview_pwd || \builtin true)" --interactive -- ${words[2,-1]} 2>/dev/null)" || __hview_result=''
 
             # Set a result to ensure completion doesn't re-run
             compadd -Q -S "" -- ""
 
             # Bind '\e[0n' to helper function.
-            \builtin bindkey '\e[0n' '__peek_p_complete_helper'
+            \builtin bindkey '\e[0n' '__hview_h_complete_helper'
             # Sends query device status code, which results in a '\e[0n' being sent to console input.
             \builtin printf '\e[5n'
 
@@ -162,25 +162,25 @@ if [[ -o zle ]]; then
         fi
     }
 
-    function __peek_p_complete_helper() {
-        if [[ -n "${__peek_result}" ]]; then
+    function __hview_h_complete_helper() {
+        if [[ -n "${__hview_result}" ]]; then
             # shellcheck disable=SC2034,SC2296
-            BUFFER="{{ cmd.unwrap_or("ls") }} ${(q-)__peek_result}"
-            __peek_result=''
+            BUFFER="{{ cmd.unwrap_or("ls") }} ${(q-)__hview_result}"
+            __hview_result=''
             \builtin zle reset-prompt
             \builtin zle accept-line
         else
             \builtin zle reset-prompt
         fi
     }
-    \builtin zle -N __peek_p_complete_helper
+    \builtin zle -N __hview_h_complete_helper
 {%- if let Some(cmd) = cmd %}
 
-    [[ "${+functions[compdef]}" -ne 0 ]] && \compdef __peek_p_complete {{ cmd }}
+    [[ "${+functions[compdef]}" -ne 0 ]] && \compdef __hview_h_complete {{ cmd }}
 {%- endif %}
 fi
 
 {{ section }}
-# To initialize peek, add this to your shell configuration file (usually ~/.zshrc):
+# To initialize hview, add this to your shell configuration file (usually ~/.zshrc):
 #
-# eval "$(peek init zsh)"
+# eval "$(hview init zsh)"

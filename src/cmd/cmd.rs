@@ -12,7 +12,7 @@ impl IntoResettable<StyledStr> for HelpTemplate {
         color_print::cstr!("\
 {before-help}<bold><underline>{name} {version}</underline></bold>
 {author}
-https://github.com/execRooted/peek
+https://github.com/execRooted/hview
 
 {about}
 
@@ -22,12 +22,12 @@ https://github.com/execRooted/peek
 {all-args}{after-help}
 
 <bold><underline>Environment variables:</underline></bold>
-{tab}<bold>_PEEK_DATA_DIR</bold>        {tab}Path for peek data files
-{tab}<bold>_PEEK_ECHO</bold>            {tab}Print the matched directory before listing it when set to 1
-{tab}<bold>_PEEK_EXCLUDE_DIRS</bold>    {tab}List of directory globs to be excluded
-{tab}<bold>_PEEK_FZF_OPTS</bold>        {tab}Custom flags to pass to fzf
-{tab}<bold>_PEEK_MAXAGE</bold>          {tab}Maximum total age after which entries start getting deleted
-{tab}<bold>_PEEK_RESOLVE_SYMLINKS</bold>{tab}Resolve symlinks when storing paths").into_resettable()
+{tab}<bold>_HVIEW_DATA_DIR</bold>        {tab}Path for hview data files
+{tab}<bold>_HVIEW_ECHO</bold>            {tab}Print the matched directory before listing it when set to 1
+{tab}<bold>_HVIEW_EXCLUDE_DIRS</bold>    {tab}List of directory globs to be excluded
+{tab}<bold>_HVIEW_FZF_OPTS</bold>        {tab}Custom flags to pass to fzf
+{tab}<bold>_HVIEW_MAXAGE</bold>          {tab}Maximum total age after which entries start getting deleted
+{tab}<bold>_HVIEW_RESOLVE_SYMLINKS</bold>{tab}Resolve symlinks when storing paths").into_resettable()
     }
 }
 
@@ -131,15 +131,15 @@ pub struct Init {
     #[clap(value_enum)]
     pub shell: InitShell,
 
-    /// Prevents peek from defining the `p` and `pi` commands
+    /// Prevents hview from defining the `h` and `hi` commands
     #[clap(long, alias = "no-aliases")]
     pub no_cmd: bool,
 
-    /// Changes the prefix of the `p` and `pi` commands
-    #[clap(long, default_value = "p")]
+    /// Changes the prefix of the `h` and `hi` commands
+    #[clap(long, default_value = "h")]
     pub cmd: String,
 
-    /// Changes how often peek increments a directory's score
+    /// Changes how often hview increments a directory's score
     #[clap(value_enum, long, default_value = "pwd")]
     pub hook: InitHook,
 }

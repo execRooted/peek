@@ -46,7 +46,7 @@ mod tests {
     #[template]
     #[rstest]
     fn opts(
-        #[values(None, Some("p"))] cmd: Option<&str>,
+        #[values(None, Some("h"))] cmd: Option<&str>,
         #[values(InitHook::None, InitHook::Prompt, InitHook::Pwd)] hook: InitHook,
         #[values(false, true)] echo: bool,
         #[values(false, true)] resolve_symlinks: bool,
@@ -292,7 +292,7 @@ mod tests {
         source.push('\n');
 
         Command::new("pylint")
-            .args(["--from-stdin", "--persistent=n", "peek"])
+            .args(["--from-stdin", "--persistent=n", "hview"])
             .write_stdin(source)
             .assert()
             .success()
