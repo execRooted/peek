@@ -1,0 +1,148 @@
+{%- let section = "# =============================================================================\n#" -%}
+{%- let not_configured = "# -- not configured --" -%}
+
+# shellcheck shell=sh
+
+{{ section }}
+# Utility functions for peek.
+#
+
+# pwd based on the value of _PEEK_RESOLVE_SYMLINKS.
+{%- decl pwd -%}
+{%- if resolve_symlinks -%}
+{%- let pwd = "\\command pwd -P" -%}
+{%- else -%}
+{%- let pwd = "\\command pwd -L" -%}
+{%- endif -%}
+{%- if cfg!(windows) %}
+if \command -v cygpath >/dev/null
+then
+  __peek_pwd() {
+    \command cygpath -w "$({{ pwd }})"
+  }
+else
+  __peek_pwd() {
+    {{ pwd }}
+  }
+fi
+{%- else %}
+__peek_pwd() {
+    {{ pwd }}
+}
+{%- endif %}
+
+# ls + custom logic based on the value of _PEEK_ECHO.
+__peek_ls() {
+    # shellcheck disable=SC2164
+    \command ls "$@" {%- if echo %} && __peek_pwd {%- endif %}
+}
+
+{{ section }}
+# Hook configuration for peek.
+#
+
+{% match hook %}
+{%- when InitHook::None -%}
+{{ not_configured }}
+
+{%- when InitHook::Prompt -%}
+# Hook to add new entries to the database.
+__peek_hook() {
+    \command peek add -- "$(__peek_pwd || \command true)"
+}
+
+# Initialize hook.
+if [ "${PS1:=}" = "${PS1#*\$(__peek_hook)}" ]; then
+    PS1="${PS1}\$(__peek_hook)"
+fi
+
+# Report common issues.
+__peek_doctor() {
+{%- if hook != InitHook::Prompt %}
+    return 0
+{%- else %}
+    [ "${_PEEK_DOCTOR:-1}" -eq 0 ] && return 0
+    case "${PS1:-}" in
+    *__peek_hook*) return 0 ;;
+    *) ;;
+    esac
+
+    _PEEK_DOCTOR=0
+    \command printf '%s\n' \
+        'peek: detected a possible configuration issue.' \
+        'Please ensure that peek is initialized right at the end of your shell configuration file.' \
+        '' \
+        'If the issue persists, consider filing an issue at:' \
+        'https://github.com/execRooted/peek/issues' \
+        '' \
+        'Disable this message by setting _PEEK_DOCTOR=0.' \
+        '' >&2
+{%- endif %}
+}
+
+{%- when InitHook::Pwd -%}
+\command printf "%s\n%s\n" \
+    "peek: PWD hooks are not supported on POSIX shells." \
+    "        Use 'peek init posix --hook prompt' instead."
+
+{%- endmatch %}
+
+{{ section }}
+# When using peek with --no-cmd, alias these internal functions as desired.
+#
+
+# Jump to a directory using only keywords.
+__peek_p() {
+    __peek_doctor
+
+    if [ "$#" -eq 0 ]; then
+        ls ~
+    elif [ "$#" -eq 1 ] && [ "$1" = '-' ]; then
+        if [ -n "${OLDPWD}" ]; then
+            ls "${OLDPWD}"
+        else
+            # shellcheck disable=SC2016
+            \command printf 'peek: $OLDPWD is not set'
+            return 1
+        fi
+    elif [ "$#" -eq 1 ] && (\command cd -- "$1") >/dev/null 2>&1; then
+        ls "$1"
+    else
+        __peek_result="$(\command peek query --exclude "$(__peek_pwd || \command true)" -- "$@")" &&
+            ls "${__peek_result}"
+    fi
+}
+
+# Jump to a directory using interactive search.
+__peek_pi() {
+    __peek_doctor
+    __peek_result="$(\command peek query --interactive -- "$@")" && ls "${__peek_result}"
+}
+
+{{ section }}
+# Commands for peek. Disable these using --no-cmd.
+#
+
+{%- match cmd %}
+{%- when Some with (cmd) %}
+
+\command unalias {{cmd}} >/dev/null 2>&1 || \true
+{{cmd}}() {
+    __peek_p "$@"
+}
+
+\command unalias {{cmd}}i >/dev/null 2>&1 || \true
+{{cmd}}i() {
+    __peek_pi "$@"
+}
+
+{%- when None %}
+
+{{ not_configured }}
+
+{%- endmatch %}
+
+{{ section }}
+# To initialize peek, add this to your configuration:
+#
+# eval "$(peek init posix --hook prompt)"

@@ -1,0 +1,82 @@
+{%- let section = "# =============================================================================\n#" -%}
+{%- let not_configured = "# -- not configured --" -%}
+
+{%- decl pwd_cmd -%}
+{%- if resolve_symlinks -%}
+{%- let pwd_cmd = "pwd -P" -%}
+{%- else -%}
+{%- let pwd_cmd = "pwd -L" -%}
+{%- endif -%}
+
+{{ section }}
+# Hook configuration for peek.
+#
+{%- if hook != InitHook::None %}
+
+# Hook to add new entries to the database.
+{%- if hook == InitHook::Prompt %}
+alias __peek_hook 'peek add -- "`{{ pwd_cmd }}`"'
+
+{%- else if hook == InitHook::Pwd %}
+set __peek_pwd_old = `{{ pwd_cmd }}`
+alias __peek_hook 'set __peek_pwd_tmp = "`{{ pwd_cmd }}`"; test "$__peek_pwd_tmp" != "$__peek_pwd_old" && peek add -- "$__peek_pwd_tmp"; set __peek_pwd_old = "$__peek_pwd_tmp"'
+{%- endif %}
+
+# Initialize hook.
+set __peek_precmd = "`alias precmd`"
+if ( "$__peek_precmd" !~ *__peek_hook* ) then
+    if ( "$__peek_precmd" == "" ) then
+        alias precmd '__peek_hook'
+    else
+        alias precmd "$__peek_precmd"';__peek_hook'
+    endif
+endif
+unset __peek_precmd
+
+{%- endif %}
+
+{{ section }}
+# When using peek with --no-cmd, alias these internal functions as desired.
+#
+
+# Jump to a directory using only keywords.
+alias __peek_p 'set __peek_args = (\!*)\
+if ("$#__peek_args" == 0) then\
+    ls ~\
+else\
+    if ("$#__peek_args" == 1 && "$__peek_args[1]" == "-") then\
+        ls -\
+    else if ("$#__peek_args" == 1 && -d "$__peek_args[1]") then\
+        ls "$__peek_args[1]"\
+    else\
+        set __peek_pwd = `{{ pwd_cmd }}`\
+        set __peek_result = "`peek query --exclude '"'"'$__peek_pwd'"'"' -- $__peek_args`" && ls "$__peek_result"\
+    endif\
+endif'
+
+# Jump to a directory using interactive search.
+alias __peek_pi 'set __peek_args = (\!*)\
+set __peek_pwd = `{{ pwd_cmd }}`\
+set __peek_result = "`peek query --exclude '"'"'$__peek_pwd'"'"' --interactive -- $__peek_args`" && ls "$__peek_result"'
+
+{{ section }}
+# Commands for peek. Disable these using --no-cmd.
+#
+
+{%- match cmd %}
+{%- when Some with (cmd) %}
+
+alias {{cmd}} __peek_p
+alias {{cmd}}i __peek_pi
+
+{%- when None %}
+
+{{ not_configured }}
+
+{%- endmatch %}
+
+{{ section }}
+# To initialize peek, add this to your shell configuration file (usually ~/.tcshrc):
+#
+#     peek init tcsh > ~/.peek.tcsh
+#     source ~/.peek.tcsh

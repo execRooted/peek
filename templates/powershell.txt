@@ -1,0 +1,145 @@
+{%- let section = "# =============================================================================\n#" -%}
+{%- let not_configured = "# -- not configured --" -%}
+
+{{ section }}
+# Utility functions for peek.
+#
+
+# Call peek binary, returning the output as UTF-8.
+function global:__peek_bin {
+    $encoding = [Console]::OutputEncoding
+    try {
+        [Console]::OutputEncoding = [System.Text.Utf8Encoding]::new()
+        $result = peek @args
+        return $result
+    } finally {
+        [Console]::OutputEncoding = $encoding
+    }
+}
+
+# pwd based on peek's format.
+function global:__peek_pwd {
+    $cwd = Microsoft.PowerShell.Management\Get-Location
+    if ($cwd.Provider.Name -eq "FileSystem") {
+        $cwd.ProviderPath
+    }
+}
+
+# ls + custom logic based on the value of _PEEK_ECHO.
+function global:__peek_ls($dir) {
+    Microsoft.PowerShell.Management\Get-ChildItem -LiteralPath $dir
+{%- if echo %}
+    Microsoft.PowerShell.Utility\Write-Output $dir
+{%- endif %}
+}
+
+{{ section }}
+# Hook configuration for peek.
+#
+
+{% if hook == InitHook::None -%}
+{{ not_configured }}
+
+{%- else -%}
+{#-
+  Initialize $__peek_hooked if it does not exist. Removing this will cause an
+  unset variable error in StrictMode.
+-#}
+{%- if hook == InitHook::Prompt -%}
+# Hook to add new entries to the database.
+function global:__peek_hook {
+    $result = __peek_pwd
+    if ($null -ne $result) {
+        peek add "--" $result
+    }
+}
+{%- else if hook == InitHook::Pwd -%}
+# Hook to add new entries to the database.
+$global:__peek_oldpwd = __peek_pwd
+function global:__peek_hook {
+    $result = __peek_pwd
+    if ($result -ne $global:__peek_oldpwd) {
+        if ($null -ne $result) {
+            peek add "--" $result
+        }
+        $global:__peek_oldpwd = $result
+    }
+}
+{%- endif %}
+
+# Initialize hook.
+$global:__peek_hooked = (Microsoft.PowerShell.Utility\Get-Variable __peek_hooked -ErrorAction Ignore -ValueOnly)
+if ($global:__peek_hooked -ne 1) {
+    $global:__peek_hooked = 1
+    $global:__peek_prompt_old = $function:prompt
+
+    function global:prompt {
+        if ($null -ne $__peek_prompt_old) {
+            & $__peek_prompt_old
+        }
+        $null = __peek_hook
+    }
+}
+{%- endif %}
+
+{{ section }}
+# When using peek with --no-cmd, alias these internal functions as desired.
+#
+
+# Jump to a directory using only keywords.
+function global:__peek_p {
+    if ($args.Length -eq 0) {
+        __peek_ls $pwd
+    }
+    elseif ($args.Length -eq 1 -and ($args[0] -eq '-' -or $args[0] -eq '+')) {
+        __peek_ls (Get-Location -Path $args[0])
+    }
+    elseif ($args.Length -eq 1 -and (Microsoft.PowerShell.Management\Test-Path -PathType Container -LiteralPath $args[0])) {
+        __peek_ls $args[0]
+    }
+    elseif ($args.Length -eq 1 -and (Microsoft.PowerShell.Management\Test-Path -PathType Container -Path $args[0] )) {
+        __peek_ls $args[0]
+    }
+    else {
+        $result = __peek_pwd
+        if ($null -ne $result) {
+            $result = __peek_bin query --exclude $result "--" @args
+        }
+        else {
+            $result = __peek_bin query "--" @args
+        }
+        if ($LASTEXITCODE -eq 0) {
+            __peek_ls $result
+        }
+    }
+}
+
+# Jump to a directory using interactive search.
+function global:__peek_pi {
+    $result = __peek_bin query -i "--" @args
+    if ($LASTEXITCODE -eq 0) {
+        __peek_ls $result
+    }
+}
+
+{{ section }}
+# Commands for peek. Disable these using --no-cmd.
+#
+
+{%- match cmd %}
+{%- when Some with (cmd) %}
+
+Microsoft.PowerShell.Utility\Set-Alias -Name {{cmd}} -Value __peek_p -Option AllScope -Scope Global -Force
+Microsoft.PowerShell.Utility\Set-Alias -Name {{cmd}}i -Value __peek_pi -Option AllScope -Scope Global -Force
+
+{%- when None %}
+
+{{ not_configured }}
+
+{%- endmatch %}
+
+{{ section }}
+# To initialize peek, add this to your configuration (find it by running
+# `echo $profile` in PowerShell):
+#
+# Invoke-Expression (& { (peek init powershell | Out-String) })

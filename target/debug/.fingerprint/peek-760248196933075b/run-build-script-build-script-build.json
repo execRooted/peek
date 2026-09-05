@@ -1,0 +1,1 @@
+{"rustc":7458672600737419911,"features":"","declared_features":"","target":0,"profile":0,"path":0,"deps":[[17323756291016246408,"build_script_build",false,13696442738921404165]],"local":[{"RerunIfChanged":{"output":"debug/build/peek-760248196933075b/output","paths":["build.rs","src/","templates/","tests/"]}}],"rustflags":[],"config":0,"compile_kind":0}

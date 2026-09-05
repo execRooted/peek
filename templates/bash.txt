@@ -1,0 +1,218 @@
+{%- let section = "# =============================================================================\n#" -%}
+{%- let not_configured = "# -- not configured --" -%}
+
+# shellcheck shell=bash
+
+{{ section }}
+# Utility functions for peek.
+#
+
+# pwd based on the value of _PEEK_RESOLVE_SYMLINKS.
+function __peek_pwd() {
+{%- decl pwd -%}
+{%- if resolve_symlinks -%}
+{%- let pwd = "\\builtin pwd -P" -%}
+{%- else -%}
+{%- let pwd = "\\builtin pwd -L" -%}
+{%- endif -%}
+{%- if cfg!(windows) %}
+    \command cygpath -w "$({{ pwd }})"
+{%- else %}
+    {{ pwd }}
+{%- endif %}
+}
+
+# ls + custom logic based on the value of _PEEK_ECHO.
+function __peek_ls() {
+    # shellcheck disable=SC2164
+    \command ls -- "$@" {%- if echo %} && __peek_pwd {%- endif %}
+}
+
+{{ section }}
+# Hook configuration for peek.
+#
+{%- if hook != InitHook::None %}
+
+# Hook to add new entries to the database.
+{%- if hook == InitHook::Prompt %}
+function __peek_hook() {
+    \builtin local -r retval="$?"
+    if [[ -o history ]]; then
+        # shellcheck disable=SC2312
+        \command peek add -- "$(__peek_pwd)"
+    fi
+    return "${retval}"
+}
+
+{%- else if hook == InitHook::Pwd %}
+__peek_oldpwd="$(__peek_pwd)"
+
+function __peek_hook() {
+    \builtin local -r retval="$?"
+    \builtin local pwd_tmp
+    pwd_tmp="$(__peek_pwd)"
+    if [[ ${__peek_oldpwd} != "${pwd_tmp}" ]]; then
+        __peek_oldpwd="${pwd_tmp}"
+        if [[ -o history ]]; then
+            \command peek add -- "${__peek_oldpwd}"
+        fi
+    fi
+    return "${retval}"
+}
+{%- endif %}
+
+# Initialize hook.
+if [[ ${PROMPT_COMMAND:=} != *'__peek_hook'* ]]; then
+    if [[ "$(declare -p PROMPT_COMMAND 2>&1)" == "declare -a"* ]]; then
+        PROMPT_COMMAND=("${PROMPT_COMMAND[@]}" __peek_hook)
+    else
+        # shellcheck disable=SC2128,SC2178
+        PROMPT_COMMAND="${PROMPT_COMMAND%"${PROMPT_COMMAND##*[![:space:];]}"}"
+        # shellcheck disable=SC2128,SC2178
+        PROMPT_COMMAND="${PROMPT_COMMAND:+${PROMPT_COMMAND};}__peek_hook"
+    fi
+fi
+
+{%- endif %}
+
+# Report common issues.
+function __peek_doctor() {
+{%- if hook == InitHook::None %}
+    return 0
+
+{%- else %}
+    [[ ${_PEEK_DOCTOR:-1} -eq 0 ]] && return 0
+    # shellcheck disable=SC2199
+    [[ ${PROMPT_COMMAND[@]:-} == *'__peek_hook'* ]] && return 0
+    # shellcheck disable=SC2199
+    [[ ${__vsc_original_prompt_command[@]:-} == *'__peek_hook'* ]] && return 0
+
+    _PEEK_DOCTOR=0
+    \builtin printf '%s\n' \
+        'peek: detected a possible configuration issue.' \
+        'Please ensure that peek is initialized right at the end of your shell configuration file (usually ~/.bashrc).' \
+        '' \
+        'If the issue persists, consider filing an issue at:' \
+        'https://github.com/execRooted/peek/issues' \
+        '' \
+        'Disable this message by setting _PEEK_DOCTOR=0.' \
+        '' >&2
+{%- endif %}
+}
+
+{{ section }}
+# When using peek with --no-cmd, alias these internal functions as desired.
+#
+
+__peek_p_prefix='p#'
+
+# Jump to a directory using only keywords.
+function __peek_p() {
+    __peek_doctor
+
+    # shellcheck disable=SC2199
+    if [[ $# -eq 0 ]]; then
+        ls ~
+    elif [[ $# -eq 1 && $1 == '-' ]]; then
+        ls "${OLDPWD}"
+    elif [[ $# -eq 1 ]] && (\builtin cd -- "$1") &>/dev/null; then
+        ls "$1"
+    elif [[ $# -eq 2 && $1 == '--' ]]; then
+        ls "$2"
+    elif [[ ${@: -1} == "${__peek_p_prefix}"?* ]]; then
+        # shellcheck disable=SC2124
+        \builtin local result="${@: -1}"
+        ls "{{ "${result:${#__peek_p_prefix}}" }}"
+    else
+        \builtin local result
+        # shellcheck disable=SC2312
+        result="$(\command peek query --exclude "$(__peek_pwd)" -- "$@")" &&
+            ls "${result}"
+    fi
+}
+
+# Jump to a directory using interactive search.
+function __peek_pi() {
+    __peek_doctor
+    \builtin local result
+    result="$(\command peek query --interactive -- "$@")" && ls "${result}"
+}
+
+{{ section }}
+# Commands for peek. Disable these using --no-cmd.
+#
+
+{%- match cmd %}
+{%- when Some with (cmd) %}
+
+\builtin unalias {{cmd}} &>/dev/null || \builtin true
+function {{cmd}}() {
+    __peek_p "$@"
+}
+
+\builtin unalias {{cmd}}i &>/dev/null || \builtin true
+function {{cmd}}i() {
+    __peek_pi "$@"
+}
+
+# Load completions.
+# - Bash 4.4+ is required to use `@Q`.
+# - Completions require line editing. Since Bash supports only two modes of
+#   line editing (`vim` and `emacs`), we check if either them is enabled.
+# - Completions don't work on `dumb` terminals.
+if [[ ${BASH_VERSINFO[0]:-0} -eq 4 && ${BASH_VERSINFO[1]:-0} -ge 4 || ${BASH_VERSINFO[0]:-0} -ge 5 ]] &&
+    [[ :"${SHELLOPTS}": =~ :(vi|emacs): && ${TERM} != 'dumb' ]]; then
+
+    function __peek_p_complete_helper() {
+        READLINE_LINE="{{ cmd }} ${__peek_result@Q}"
+        READLINE_POINT={{ "${#READLINE_LINE}" }}
+        bind '"\e[0n": accept-line'
+        \builtin printf '\e[5n' >/dev/tty
+    }
+
+    function __peek_p_complete() {
+        # Only show completions when the cursor is at the end of the line.
+        [[ {{ "${#COMP_WORDS[@]}" }} -eq $((COMP_CWORD + 1)) ]] || return
+
+        # If there is only one argument, use `ls` completions.
+        if [[ {{ "${#COMP_WORDS[@]}" }} -eq 2 ]]; then
+            \builtin mapfile -t COMPREPLY < <(
+                \builtin compgen -A directory -- "${COMP_WORDS[-1]}" || \builtin true
+            )
+        # If there is a space after the last word, use interactive selection.
+        elif [[ -z ${COMP_WORDS[-1]} ]]; then
+            # shellcheck disable=SC2312
+            if __peek_result="$(\command peek query --exclude "$(__peek_pwd)" --interactive -- "{{ "${COMP_WORDS[@]:1:${#COMP_WORDS[@]}-2}" }}" 2>/dev/null)"; then
+                # In case the terminal does not respond to \e[0n or another
+                # mechanism steals the response, it is still worth completing
+                # the directory in the command line.
+                COMPREPLY=("${__peek_p_prefix}${__peek_result}/")
+
+                # Note: We here call "bind" without prefixing "\builtin" to be
+                # compatible with frameworks like ble.sh, which emulates Bash's
+                # builtin "bind".
+                bind -x '"\e[0n": __peek_p_complete_helper'
+                \builtin printf '\e[5n' >/dev/tty
+            else
+                # The interactive selection was cancelled. fzf has drawn over
+                # the prompt, so redraw the current line.
+                bind '"\e[0n": redraw-current-line'
+                \builtin printf '\e[5n' >/dev/tty
+            fi
+        fi
+    }
+
+    \builtin complete -F __peek_p_complete -o filenames -- {{cmd}}
+    \builtin complete -r {{cmd}}i &>/dev/null || \builtin true
+fi
+
+{%- when None %}
+
+{{ not_configured }}
+
+{%- endmatch %}
+
+{{ section }}
+# To initialize peek, add this to your shell configuration file (usually ~/.bashrc):
+#
+# eval "$(peek init bash)"

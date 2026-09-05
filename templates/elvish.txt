@@ -1,0 +1,120 @@
+{%- let section = "# =============================================================================\n#" -%}
+{%- let not_configured = "# -- not configured --" -%}
+
+use builtin
+use path
+
+{{ section }}
+# Utility functions for peek.
+#
+
+# ls + custom logic based on the value of _PEEK_ECHO.
+fn __peek_ls {|path|
+    builtin:ls $path
+{%- if echo %}
+    builtin:echo $pwd
+{%- endif %}
+}
+
+{{ section }}
+# Hook configuration for peek.
+#
+
+# Initialize hook to track previous directory.
+var oldpwd = $builtin:pwd
+set builtin:before-chdir = [$@builtin:before-chdir {|_| set oldpwd = $builtin:pwd }]
+
+# Initialize hook to add directories to peek.
+{%- if hook == InitHook::None %}
+{{ not_configured }}
+
+{%- else %}
+if (builtin:not (builtin:eq $E:__peek_shlvl $E:SHLVL)) {
+    set E:__peek_shlvl = $E:SHLVL
+{%- if hook == InitHook::Prompt %}
+    set edit:before-readline = [$@edit:before-readline {|| peek add -- $pwd }]
+{%- else if hook == InitHook::Pwd %}
+    set builtin:after-chdir = [$@builtin:after-chdir {|_| peek add -- $pwd }]
+{%- endif %}
+}
+
+{%- endif %}
+
+{{ section }}
+# When using peek with --no-cmd, alias these internal functions as desired.
+#
+
+# Jump to a directory using only keywords.
+fn __peek_p {|@rest|
+    if (builtin:eq [] $rest) {
+        ls ~
+    } elif (builtin:eq [-] $rest) {
+        ls $oldpwd
+    } elif (and ('builtin:==' (builtin:count $rest) 1) (path:is-dir &follow-symlink=$true $rest[0])) {
+        ls $rest[0]
+    } else {
+        var path
+        try {
+            set path = (peek query --exclude $pwd -- $@rest)
+        } catch {
+        } else {
+            ls $path
+        }
+    }
+}
+edit:add-var __peek_p~ $__peek_p~
+
+# Jump to a directory using interactive search.
+fn __peek_pi {|@rest|
+    var path
+    try {
+        set path = (peek query --interactive -- $@rest)
+    } catch {
+    } else {
+        ls $path
+    }
+}
+edit:add-var __peek_pi~ $__peek_pi~
+
+{{ section }}
+# Commands for peek. Disable these using --no-cmd.
+#
+
+{%- match cmd %}
+{%- when Some with (cmd) %}
+
+edit:add-var {{cmd}}~ $__peek_p~
+edit:add-var {{cmd}}i~ $__peek_pi~
+
+# Load completions.
+{#-
+  peek-based completions are currently not possible, because Elvish only prints
+  a completion if the current token is a prefix of it.
+#}
+fn __peek_p_complete {|@rest|
+    if (!= (builtin:count $rest) 2) {
+        builtin:return
+    }
+    edit:complete-filename $rest[1] |
+        builtin:each {|completion|
+            var dir = $completion[stem]
+            if (path:is-dir $dir) {
+                builtin:put $dir
+            }
+        }
+}
+set edit:completion:arg-completer[{{cmd}}] = $__peek_p_complete~
+
+{%- when None %}
+
+{{ not_configured }}
+
+{%- endmatch %}
+
+{{ section }}
+# To initialize peek, add this to your configuration (usually
+# ~/.elvish/rc.elv):
+#
+#   eval (peek init elvish | slurp)
+#
+# Note: peek only supports elvish v0.18.0 and above.
