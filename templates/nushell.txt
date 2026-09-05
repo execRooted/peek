@@ -60,7 +60,9 @@ export def --env --wrapped __hview_h [...rest: directory] {
   match $rest {
     [] => { ls . },
     [ '-' ] => { ls - },
-    [ $arg ] if (try { ls $arg; true } catch { false }) => {},
+    [ $arg ] if (try { ls $arg; true } catch { false }) => {
+      ^hview add -- $arg
+    },
     _ => {
       ls (^hview query --exclude $env.PWD -- ...$rest | str trim -r -c "\n")
     }

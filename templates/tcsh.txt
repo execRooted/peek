@@ -47,10 +47,10 @@ else\
     if ("$#__hview_args" == 1 && "$__hview_args[1]" == "-") then\
         ls -\
     else if ("$#__hview_args" == 1 && -d "$__hview_args[1]") then\
-        ls "$__hview_args[1]"\
+        ls "$__hview_args[1]"; hview add -- "$__hview_args[1]"\
     else\
         set __hview_pwd = `{{ pwd_cmd }}`\
-        set __hview_result = "`hview query --exclude '"'"'$__hview_pwd'"'"' -- $__hview_args`" && ls "$__hview_result"\
+        set __hview_result = "`hview query --exclude '"'"'$__hview_pwd'"'"' -- $__hview_args`" && ls "$__hview_result" && hview add -- "$__hview_result"\
     endif\
 endif'
 

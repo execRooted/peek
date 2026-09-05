@@ -121,6 +121,8 @@ def __hview_h(args: list[str]) -> None:
         __hview_ls("-")
     elif len(args) == 1 and os.path.isdir(args[0]):
         __hview_ls(args[0])
+        hview = __hview_bin()
+        subprocess.run([hview, "add", "--", args[0]], check=False)
     else:
         try:
             hview = __hview_bin()
@@ -135,6 +137,8 @@ def __hview_h(args: list[str]) -> None:
 
         result = cmd.stdout[:-1]
         __hview_ls(result)
+        hview = __hview_bin()
+        subprocess.run([hview, "add", "--", result], check=False)
 
 
 @__hview_errhandler

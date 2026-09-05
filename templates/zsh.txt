@@ -93,12 +93,14 @@ function __hview_h() {
         ls "${OLDPWD}"
     elif [[ "$#" -eq 1 ]] && { [[ "$1" =~ ^[-+][0-9]+$ ]] || (\builtin cd -q -- "$1") &>/dev/null; }; then
         ls "$1"
+        \command hview add -- "$1"
     elif [[ "$#" -eq 2 ]] && [[ "$1" = "--" ]]; then
         ls "$2"
+        \command hview add -- "$2"
     else
         \builtin local result
         # shellcheck disable=SC2312
-        result="$(\command hview query --exclude "$(__hview_pwd)" -- "$@")" && ls "${result}"
+        result="$(\command hview query --exclude "$(__hview_pwd)" -- "$@")" && ls "${result}" && \command hview add -- "${result}"
     fi
 }
 

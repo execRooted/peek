@@ -96,9 +96,11 @@ function global:__hview_h {
     }
     elseif ($args.Length -eq 1 -and (Microsoft.PowerShell.Management\Test-Path -PathType Container -LiteralPath $args[0])) {
         __hview_ls $args[0]
+        hview add "--" $args[0]
     }
     elseif ($args.Length -eq 1 -and (Microsoft.PowerShell.Management\Test-Path -PathType Container -Path $args[0] )) {
         __hview_ls $args[0]
+        hview add "--" $args[0]
     }
     else {
         $result = __hview_pwd
@@ -110,6 +112,7 @@ function global:__hview_h {
         }
         if ($LASTEXITCODE -eq 0) {
             __hview_ls $result
+            hview add "--" $result
         }
     }
 }

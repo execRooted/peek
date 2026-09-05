@@ -71,11 +71,14 @@ function __hview_h
         ls -
     else if test $argc -eq 1 -a -d $argv[1]
         ls $argv[1]
+        hview add -- $argv[1]
     else if test $argc -eq 2 -a $argv[1] = --
         ls -- $argv[2]
+        hview add -- $argv[2]
     else
         set -l result (command hview query --exclude (__hview_pwd) -- $argv)
         and ls $result
+        and hview add -- $result
     end
 end
 

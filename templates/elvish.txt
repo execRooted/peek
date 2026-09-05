@@ -52,6 +52,7 @@ fn __hview_h {|@rest|
         ls $oldpwd
     } elif (and ('builtin:==' (builtin:count $rest) 1) (path:is-dir &follow-symlink=$true $rest[0])) {
         ls $rest[0]
+        hview add -- $rest[0]
     } else {
         var path
         try {
@@ -59,6 +60,7 @@ fn __hview_h {|@rest|
         } catch {
         } else {
             ls $path
+            hview add -- $path
         }
     }
 }
@@ -72,6 +74,7 @@ fn __hview_hi {|@rest|
     } catch {
     } else {
         ls $path
+        hview add -- $path
     }
 }
 edit:add-var __hview_hi~ $__hview_hi~
