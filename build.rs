@@ -22,6 +22,7 @@ fn main() -> io::Result<()> {
 fn generate_completions() -> io::Result<()> {
     const BIN_NAME: &str = env!("CARGO_PKG_NAME");
     const OUT_DIR: &str = "contrib/completions";
+    std::fs::create_dir_all(OUT_DIR)?;
     let cmd = &mut Cmd::command();
 
     clap_complete::generate_to(Bash, cmd, BIN_NAME, OUT_DIR)?;
