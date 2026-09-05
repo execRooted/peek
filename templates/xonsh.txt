@@ -155,6 +155,14 @@ def __hview_hi(args: list[str]) -> None:
     __hview_ls(result)
 
 
+def __hview_ls_wrapper(args: list[str]) -> None:
+    """Wrapper for ls to automatically add listed directories to hview."""
+    subprocess.run(["ls"] + args, check=True)
+    if len(args) >= 1 and os.path.isdir(args[-1]):
+        hview = __hview_bin()
+        subprocess.run([hview, "add", "--", args[-1]], check=False)
+
+
 {{ section }}
 # Commands for hview. Disable these using --no-cmd.
 #
@@ -170,6 +178,8 @@ builtins.aliases["{{cmd}}i"] = __hview_hi  # type: ignore  # pylint:disable=no-m
 {{ not_configured }}
 
 {%- endmatch %}
+
+builtins.aliases["ls"] = __hview_ls_wrapper  # type: ignore  # pylint:disable=no-member
 
 {{ section }}
 # To initialize hview, add this to your configuration (usually ~/.xonshrc):

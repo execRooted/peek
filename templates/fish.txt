@@ -38,6 +38,15 @@ function __hview_ls
 {%- endif %}
 end
 
+# Wrapper for ls to automatically add listed directories to hview.
+function __hview_ls_wrapper
+    command ls $argv
+    if test (count $argv) -ge 1 -a -d $argv[-1]
+        hview add -- $argv[-1]
+    end
+end
+alias ls=__hview_ls_wrapper
+
 {{ section }}
 # Hook configuration for hview.
 #
@@ -66,16 +75,16 @@ end
 function __hview_h
     set -l argc (builtin count $argv)
     if test $argc -eq 0
-        ls $HOME
+        command ls $HOME
     else if test "$argv" = -
-        ls -
+        command ls -
     else if test $argc -eq 1 -a -d $argv[1]
-        ls $argv[1]
+        command ls $argv[1]
     else if test $argc -eq 2 -a $argv[1] = --
-        ls -- $argv[2]
+        command ls -- $argv[2]
     else
         set -l result (command hview query --exclude (__hview_pwd) -- $argv)
-        and ls $result
+        and command ls $result
     end
 end
 
@@ -104,7 +113,7 @@ complete --command __hview_h --no-files --arguments '(__hview_h_complete)'
 # Jump to a directory using interactive search.
 function __hview_hi
     set -l result (command hview query --interactive -- $argv)
-    and ls $result
+    and command ls $result
 end
 
 {{ section }}

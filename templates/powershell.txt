@@ -122,6 +122,16 @@ function global:__hview_hi {
     }
 }
 
+# Wrapper for ls to automatically add listed directories to hview.
+function global:__hview_ls_wrapper {
+    param([Parameter(ValueFromRemainingArguments=$true)][string[]]$Args)
+    Microsoft.PowerShell.Management\Get-ChildItem @Args
+    if ($Args.Count -ge 1 -and (Microsoft.PowerShell.Management\Test-Path -PathType Container -LiteralPath $Args[-1])) {
+        hview add "--" $Args[-1]
+    }
+}
+Microsoft.PowerShell.Utility\Set-Alias -Name ls -Value __hview_ls_wrapper -Option AllScope -Scope Global -Force
+
 {{ section }}
 # Commands for hview. Disable these using --no-cmd.
 #
