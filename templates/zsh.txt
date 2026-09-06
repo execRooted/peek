@@ -91,6 +91,9 @@ function __hview_h() {
         ls .
     elif [[ "$#" -eq 1 ]] && [[ "$1" = '-' ]]; then
         ls "${OLDPWD}"
+    elif [[ "$#" -eq 1 ]] && [[ -f "$1" ]]; then
+        \command cat -- "$1"
+        \command hview add -- "$1"
     elif [[ "$#" -eq 1 ]] && { [[ "$1" =~ ^[-+][0-9]+$ ]] || (\builtin cd -q -- "$1") &>/dev/null; }; then
         ls "$1"
         \command hview add -- "$1"

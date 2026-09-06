@@ -105,6 +105,9 @@ __hview_h() {
             \command printf 'hview: $OLDPWD is not set'
             return 1
         fi
+    elif [ "$#" -eq 1 ] && [ -f "$1" ]; then
+        \command cat -- "$1"
+        \command hview add -- "$1"
     elif [ "$#" -eq 1 ] && (\command cd -- "$1") >/dev/null 2>&1; then
         ls "$1"
         \command hview add -- "$1"

@@ -94,16 +94,16 @@ function global:__hview_h {
     elseif ($args.Length -eq 1 -and ($args[0] -eq '-' -or $args[0] -eq '+')) {
         __hview_ls (Get-Location -Path $args[0])
     }
+    elseif ($args.Length -eq 1 -and (Microsoft.PowerShell.Management\Test-Path -PathType Leaf -LiteralPath $args[0])) {
+        Microsoft.PowerShell.Utility\Get-Content -LiteralPath $args[0]
+        hview add "--" $args[0]
+    }
     elseif ($args.Length -eq 1 -and (Microsoft.PowerShell.Management\Test-Path -PathType Container -LiteralPath $args[0])) {
         __hview_ls $args[0]
         hview add "--" $args[0]
     }
     elseif ($args.Length -eq 1 -and (Microsoft.PowerShell.Management\Test-Path -PathType Container -Path $args[0] )) {
         __hview_ls $args[0]
-        hview add "--" $args[0]
-    }
-    elseif ($args.Length -eq 1 -and (Microsoft.PowerShell.Management\Test-Path -PathType Leaf -LiteralPath $args[0])) {
-        Microsoft.PowerShell.Utility\Get-Content -LiteralPath $args[0]
         hview add "--" $args[0]
     }
     elseif ($args.Length -eq 1 -and (Microsoft.PowerShell.Management\Test-Path -PathType Leaf -Path $args[0] )) {

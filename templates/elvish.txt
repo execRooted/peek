@@ -50,6 +50,9 @@ fn __hview_h {|@rest|
         ls .
     } elif (builtin:eq [-] $rest) {
         ls $oldpwd
+    } elif (and ('builtin:==' (builtin:count $rest) 1) (path:is-file $rest[0])) {
+        cat $rest[0]
+        hview add -- $rest[0]
     } elif (and ('builtin:==' (builtin:count $rest) 1) (path:is-dir &follow-symlink=$true $rest[0])) {
         ls $rest[0]
         hview add -- $rest[0]
