@@ -73,17 +73,29 @@ function __hview_h
         ls $argv[1]
         hview add -- $argv[1]
     else if test $argc -eq 2 -a $argv[1] = --
-        ls -- $argv[2]
+        if test -f $argv[2]
+            cat $argv[2]
+        else
+            ls $argv[2]
+        end
         hview add -- $argv[2]
     else
         set -l matches (command hview query --list --exclude (__hview_pwd) -- $argv)
         set -l count (count $matches)
         if test $count -eq 1
-            ls $matches
+            if test -f $matches
+                cat $matches
+            else
+                ls $matches
+            end
             hview add -- $matches
         else if test $count -gt 1
             set -l result (command hview query --interactive --exclude (__hview_pwd) -- $argv)
-            and ls $result
+            and if test -f $result
+                cat $result
+            else
+                ls $result
+            end
         end
     end
 end
@@ -113,7 +125,11 @@ complete --command __hview_h --no-files --arguments '(__hview_h_complete)'
 # Jump to a directory using interactive search.
 function __hview_hi
     set -l result (command hview query --interactive -- $argv)
-    and ls $result
+    and if test -f $result
+        cat $result
+    else
+        ls $result
+    end
 end
 
 {{ section }}

@@ -102,6 +102,14 @@ function global:__hview_h {
         __hview_ls $args[0]
         hview add "--" $args[0]
     }
+    elseif ($args.Length -eq 1 -and (Microsoft.PowerShell.Management\Test-Path -PathType Leaf -LiteralPath $args[0])) {
+        Microsoft.PowerShell.Utility\Get-Content -LiteralPath $args[0]
+        hview add "--" $args[0]
+    }
+    elseif ($args.Length -eq 1 -and (Microsoft.PowerShell.Management\Test-Path -PathType Leaf -Path $args[0] )) {
+        Microsoft.PowerShell.Utility\Get-Content -LiteralPath $args[0]
+        hview add "--" $args[0]
+    }
     else {
         $result = __hview_pwd
         if ($null -ne $result) {
@@ -113,7 +121,11 @@ function global:__hview_h {
         if ($LASTEXITCODE -eq 0 -and $list) {
             $count = ($list -split "`n").Count
             if ($count -eq 1) {
-                __hview_ls $list
+                if ((Microsoft.PowerShell.Management\Get-Item -LiteralPath $list).PSIsContainer) {
+                    __hview_ls $list
+                } else {
+                    Microsoft.PowerShell.Utility\Get-Content -LiteralPath $list
+                }
                 hview add "--" $list
             }
             else {
@@ -124,7 +136,11 @@ function global:__hview_h {
                     $result = __hview_bin query --interactive "--" @args
                 }
                 if ($LASTEXITCODE -eq 0) {
-                    __hview_ls $result
+                    if ((Microsoft.PowerShell.Management\Get-Item -LiteralPath $result).PSIsContainer) {
+                        __hview_ls $result
+                    } else {
+                        Microsoft.PowerShell.Utility\Get-Content -LiteralPath $result
+                    }
                 }
             }
         }
@@ -135,7 +151,11 @@ function global:__hview_h {
 function global:__hview_hi {
     $result = __hview_bin query -i "--" @args
     if ($LASTEXITCODE -eq 0) {
-        __hview_ls $result
+        if ((Microsoft.PowerShell.Management\Get-Item -LiteralPath $result).PSIsContainer) {
+            __hview_ls $result
+        } else {
+            Microsoft.PowerShell.Utility\Get-Content -LiteralPath $result
+        }
     }
 }
 

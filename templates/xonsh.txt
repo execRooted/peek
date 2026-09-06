@@ -123,6 +123,11 @@ def __hview_h(args: list[str]) -> None:
         __hview_ls(args[0])
         hview = __hview_bin()
         subprocess.run([hview, "add", "--", args[0]], check=False)
+    elif len(args) == 1 and os.path.isfile(args[0]):
+        with open(args[0]) as f:
+            sys.stdout.write(f.read())
+        hview = __hview_bin()
+        subprocess.run([hview, "add", "--", args[0]], check=False)
     else:
         try:
             hview = __hview_bin()
@@ -136,7 +141,11 @@ def __hview_h(args: list[str]) -> None:
             if matches:
                 count = len(matches.splitlines())
                 if count == 1:
-                    __hview_ls(matches)
+                    if os.path.isfile(matches):
+                        with open(matches) as f:
+                            sys.stdout.write(f.read())
+                    else:
+                        __hview_ls(matches)
                     subprocess.run([hview, "add", "--", matches], check=False)
                 else:
                     cmd = subprocess.run(
@@ -145,7 +154,12 @@ def __hview_h(args: list[str]) -> None:
                         env=__hview_env(),
                         stdout=subprocess.PIPE,
                     )
-                    __hview_ls(cmd.stdout[:-1])
+                    result = cmd.stdout.decode("utf-8")[:-1]
+                    if os.path.isfile(result):
+                        with open(result) as f:
+                            sys.stdout.write(f.read())
+                    else:
+                        __hview_ls(result)
         except subprocess.CalledProcessError as exc:
             raise HviewSilentException() from exc
 
@@ -164,8 +178,12 @@ def __hview_hi(args: list[str]) -> None:
     except subprocess.CalledProcessError as exc:
         raise HviewSilentException() from exc
 
-    result = cmd.stdout[:-1]
-    __hview_ls(result)
+    result = cmd.stdout.decode("utf-8")[:-1]
+    if os.path.isfile(result):
+        with open(result) as f:
+            sys.stdout.write(f.read())
+    else:
+        __hview_ls(result)
 
 
 {{ section }}

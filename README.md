@@ -1,8 +1,8 @@
 # hview
 
-**hop view — a smarter `ls` command for your terminal.**
+**hop view — a smarter `ls` and `cat` command for your terminal.**
 
-hview remembers which directories you use most frequently, so you can "list" them in just a few keystrokes. It's cross-platform and works on macOS, Linux, and Windows.
+hview remembers which directories and files you use most frequently, so you can "list" or "cat" them in just a few keystrokes. It's cross-platform and works on macOS, Linux, and Windows.
 
 Inspired by [z](https://github.com/rupa/z) and [autojump](https://github.com/wting/autojump).
 
@@ -97,6 +97,9 @@ h ~/foo            # h also works like a regular ls command
 h foo/             # list relative path
 h ..               # list one level up
 h -                # list previous directory
+
+h /path/to/file    # cat a file, or ls a directory
+h -- /path/to/file # explicitly cat a file or ls a directory
 
 hi foo             # interactive selection (using fzf)
 

@@ -53,6 +53,9 @@ fn __hview_h {|@rest|
     } elif (and ('builtin:==' (builtin:count $rest) 1) (path:is-dir &follow-symlink=$true $rest[0])) {
         ls $rest[0]
         hview add -- $rest[0]
+    } elif (and ('builtin:==' (builtin:count $rest) 1) (path:is-file $rest[0])) {
+        cat $rest[0]
+        hview add -- $rest[0]
     } else {
         var path
         try {
@@ -62,11 +65,19 @@ fn __hview_h {|@rest|
             if (!= $path "") {
                 set path_count = (builtin:count (str:split "\n" $path))
                 if (== $path_count 1) {
-                    ls $path
+                    if (path:is-file $path) {
+                        cat $path
+                    } else {
+                        ls $path
+                    }
                     hview add -- $path
                 } else {
                     set path = (hview query --interactive --exclude $pwd -- $@rest)
-                    ls $path
+                    if (path:is-file $path) {
+                        cat $path
+                    } else {
+                        ls $path
+                    }
                 }
             }
         }
@@ -81,7 +92,11 @@ fn __hview_hi {|@rest|
         set path = (hview query --interactive -- $@rest)
     } catch {
     } else {
-        ls $path
+        if (path:is-file $path) {
+            cat $path
+        } else {
+            ls $path
+        }
         hview add -- $path
     }
 }

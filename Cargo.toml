@@ -10,7 +10,7 @@ name = "hview"
 readme = "README.md"
 repository = "https://github.com/execRooted/hview"
 rust-version = "1.88.0"
-version = "1.5.1"
+version = "1.5.5"
 
 exclude = [
     "target/",
@@ -134,8 +134,8 @@ assets = [
     ],
 ]
 extended-description = """\
-hview (hop view) is a smarter ls command, inspired by z and autojump. It remembers which \
-directories you use most frequently, so you can "jump" to them in just a few \
+hview (hop view) is a smarter ls and cat command, inspired by z and autojump. It remembers which \
+directories and files you use most frequently, so you can "jump" to or view them in just a few \
 keystrokes."""
 priority = "optional"
 section = "utils"

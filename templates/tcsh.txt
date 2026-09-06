@@ -48,14 +48,26 @@ else\
         ls -\
     else if ("$#__hview_args" == 1 && -d "$__hview_args[1]") then\
         ls "$__hview_args[1]"; hview add -- "$__hview_args[1]"\
+    else if ("$#__hview_args" == 1 && -f "$__hview_args[1]") then\
+        cat "$__hview_args[1]"; hview add -- "$__hview_args[1]"\
     else\
         set __hview_list = "`hview query --exclude '"'"'$__hview_pwd'"'"' --list -- $__hview_args`"\
         if ("$__hview_list" != "") then\
             set __hview_count = `echo "$__hview_list" | grep -c '^'`\
             if ($__hview_count == 1) then\
-                ls "$__hview_list"; hview add -- "$__hview_list"\
+                if (-f "$__hview_list") then\
+                    cat "$__hview_list"\
+                else\
+                    ls "$__hview_list"\
+                endif\
+                hview add -- "$__hview_list"\
             else if ($__hview_count > 1) then\
-                set __hview_result = "`hview query --exclude '"'"'$__hview_pwd'"'"' --interactive -- $__hview_args`" && ls "$__hview_result"\
+                set __hview_result = "`hview query --exclude '"'"'$__hview_pwd'"'"' --interactive -- $__hview_args`" && \
+                if (-f "$__hview_result") then\
+                    cat "$__hview_result"\
+                else\
+                    ls "$__hview_result"\
+                endif\
             endif\
         endif\
     endif\
@@ -64,7 +76,12 @@ endif'
 # Jump to a directory using interactive search.
 alias __hview_hi 'set __hview_args = (\!*)\
 set __hview_pwd = `{{ pwd_cmd }}`\
-set __hview_result = "`hview query --exclude '"'"'$__hview_pwd'"'"' --interactive -- $__hview_args`" && ls "$__hview_result"'
+set __hview_result = "`hview query --exclude '"'"'$__hview_pwd'"'"' --interactive -- $__hview_args`" && \
+if (-f "$__hview_result") then\
+    cat "$__hview_result"\
+else\
+    ls "$__hview_result"\
+endif'
 #
 
 {%- match cmd %}

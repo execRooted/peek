@@ -113,10 +113,20 @@ __hview_h() {
         if [ -n "$__hview_result" ]; then
             count=$(printf '%s' "$__hview_result" | wc -l)
             if [ "$count" -eq 1 ]; then
-                ls "$__hview_result" && \command hview add -- "$__hview_result"
+                if [ -f "$__hview_result" ]; then
+                    \command cat -- "$__hview_result"
+                else
+                    ls "$__hview_result"
+                fi
+                \command hview add -- "$__hview_result"
             elif [ "$count" -gt 1 ]; then
-                __hview_result="$(\command hview query --interactive --exclude "$(__hview_pwd || \command true)" -- "$@")" &&
-                    ls "${__hview_result}"
+                __hview_result="$(\command hview query --interactive --exclude "$(__hview_pwd || \command true)" -- "$@")" && {
+                    if [ -f "$__hview_result" ]; then
+                        \command cat -- "$__hview_result"
+                    else
+                        ls "${__hview_result}"
+                    fi
+                }
             fi
         fi
     fi
@@ -125,7 +135,13 @@ __hview_h() {
 # Jump to a directory using interactive search.
 __hview_hi() {
     __hview_doctor
-    __hview_result="$(\command hview query --interactive -- "$@")" && ls "${__hview_result}"
+    __hview_result="$(\command hview query --interactive -- "$@")" && {
+        if [ -f "$__hview_result" ]; then
+            \command cat -- "$__hview_result"
+        else
+            ls "${__hview_result}"
+        fi
+    }
 }
 
 {{ section }}

@@ -56,7 +56,7 @@ pub enum Cmd {
     help_template = HelpTemplate,
 )]
 pub struct Add {
-    #[clap(num_args = 1.., required = true, value_hint = ValueHint::DirPath)]
+    #[clap(num_args = 1.., required = true, value_hint = ValueHint::FilePath)]
     pub paths: Vec<PathBuf>,
 
     /// The rank to increment the entry if it exists or initialize it with if it
@@ -206,6 +206,6 @@ pub struct Query {
     help_template = HelpTemplate,
 )]
 pub struct Remove {
-    #[clap(value_hint = ValueHint::DirPath)]
+    #[clap(value_hint = ValueHint::FilePath)]
     pub paths: Vec<String>,
 }

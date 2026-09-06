@@ -27,7 +27,7 @@ const completion: Fig.Spec = {
       args: {
         name: "paths",
         isVariadic: true,
-        template: "folders",
+        template: "filepaths",
       },
     },
     {
@@ -374,7 +374,7 @@ const completion: Fig.Spec = {
         name: "paths",
         isVariadic: true,
         isOptional: true,
-        template: "folders",
+        template: "filepaths",
       },
     },
   ],

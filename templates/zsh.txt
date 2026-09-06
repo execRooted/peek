@@ -95,7 +95,11 @@ function __hview_h() {
         ls "$1"
         \command hview add -- "$1"
     elif [[ "$#" -eq 2 ]] && [[ "$1" = "--" ]]; then
-        ls "$2"
+        if [[ -f "$2" ]]; then
+            \command cat -- "$2"
+        else
+            ls "$2"
+        fi
         \command hview add -- "$2"
     else
         \builtin local result
@@ -103,9 +107,20 @@ function __hview_h() {
         if [[ -n "$result" ]]; then
             count=$(printf '%s' "$result" | wc -l)
             if [[ "$count" -eq 1 ]]; then
-                ls "$result" && \command hview add -- "$result"
+                if [[ -f "$result" ]]; then
+                    \command cat -- "$result"
+                else
+                    ls "$result"
+                fi
+                \command hview add -- "$result"
             elif [[ "$count" -gt 1 ]]; then
-                result="$(\command hview query --interactive --exclude "$(__hview_pwd)" -- "$@")" && ls "${result}"
+                result="$(\command hview query --interactive --exclude "$(__hview_pwd)" -- "$@")" && {
+                    if [[ -f "$result" ]]; then
+                        \command cat -- "$result"
+                    else
+                        ls "${result}"
+                    fi
+                }
             fi
         fi
     fi
@@ -115,7 +130,13 @@ function __hview_h() {
 function __hview_hi() {
     __hview_doctor
     \builtin local result
-    result="$(\command hview query --interactive -- "$@")" && ls "${result}"
+    result="$(\command hview query --interactive -- "$@")" && {
+        if [[ -f "$result" ]]; then
+            \command cat -- "$result"
+        else
+            ls "${result}"
+        fi
+    }
 }
 
 {{ section }}

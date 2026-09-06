@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use anyhow::{Result, bail};
+use anyhow::Result;
 
 use crate::cmd::{Add, Run};
 use crate::db::Database;
@@ -30,8 +30,8 @@ impl Run for Add {
             if path.contains(EXCLUDE_CHARS) || exclude_dirs.iter().any(|glob| glob.matches(path)) {
                 continue;
             }
-            if !Path::new(path).is_dir() {
-                bail!("not a directory: {path}");
+            if !Path::new(path).exists() {
+                continue;
             }
 
             let by = self.score.unwrap_or(1.0);

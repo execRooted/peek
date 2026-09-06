@@ -61,6 +61,11 @@ export def --env --wrapped __hview_h [...rest: directory] {
     [] => { ls . },
     [ '-' ] => { ls - },
     [ $arg ] if (try { ls $arg; true } catch { false }) => {
+      if (($arg | metadata | get type) == 'File') {
+        cat $arg
+      } else {
+        ls $arg
+      }
       ^hview add -- $arg
     },
     _ => {
@@ -68,9 +73,18 @@ export def --env --wrapped __hview_h [...rest: directory] {
       if ($matches != "") {
         let count = ($matches | lines | length)
         if ($count == 1) {
-          ls $matches
+          if (($matches | metadata | get type) == 'File') {
+            cat $matches
+          } else {
+            ls $matches
+          }
         } else {
-          ls (^hview query --interactive --exclude $env.PWD -- ...$rest | str trim -r -c "\n")
+          let match = (^hview query --interactive --exclude $env.PWD -- ...$rest | str trim -r -c "\n")
+          if (($match | metadata | get type) == 'File') {
+            cat $match
+          } else {
+            ls $match
+          }
         }
       }
     }
@@ -82,7 +96,12 @@ export def --env --wrapped __hview_h [...rest: directory] {
 
 # Jump to a directory using interactive search.
 export def --env --wrapped __hview_hi [...rest: string] {
-  ls $'(^hview query --interactive -- ...$rest | str trim -r -c "\n")'
+    let result = (^hview query --interactive -- ...$rest | str trim -r -c "\n")
+    if (($result | metadata | get type) == 'File') {
+        cat $result
+    } else {
+        ls $result
+    }
 {%- if echo %}
   echo $env.PWD
 {%- endif %}
