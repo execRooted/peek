@@ -67,7 +67,7 @@ impl Query {
     fn query_first(&self, stream: &mut Stream, now: Epoch) -> Result<()> {
         let handle = &mut io::stdout();
 
-        let mut dir = stream.next().context("no match found")?;
+        let mut dir = stream.next().context("no file/directory found")?;
         while Some(dir.path.as_ref()) == self.exclude.as_deref() {
             dir = stream.next().context("you are already in the only match")?;
         }

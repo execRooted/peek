@@ -69,6 +69,8 @@ else\
                     ls "$__hview_result"\
                 endif\
             endif\
+        else\
+            echo "hview: no file/directory found" > /dev/stderr\
         endif\
     endif\
 endif'

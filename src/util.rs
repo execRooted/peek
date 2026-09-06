@@ -141,7 +141,7 @@ impl FzfChild {
         let status = self.0.wait().context("wait failed on fzf")?;
         match status.code() {
             Some(0) => Ok(output),
-            Some(1) => bail!("no match found"),
+            Some(1) => bail!("no file/directory found"),
             Some(2) => bail!("fzf returned an error"),
             Some(130) => bail!(SilentExit { code: 130 }),
             Some(128..=254) | None => bail!("fzf was terminated"),

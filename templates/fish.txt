@@ -99,6 +99,8 @@ function __hview_h
             else
                 ls $result
             end
+        else
+            echo 'hview: no file/directory found' >&2
         end
     end
 end

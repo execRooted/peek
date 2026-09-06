@@ -144,6 +144,9 @@ function global:__hview_h {
                 }
             }
         }
+        else {
+            [Console]::Error.WriteLine("hview: no file/directory found")
+        }
     }
 }
 

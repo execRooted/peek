@@ -82,6 +82,8 @@ fn __hview_h {|@rest|
                         ls $path
                     }
                 }
+            } else {
+                echo 'hview: no file/directory found' >&2
             }
         }
     }

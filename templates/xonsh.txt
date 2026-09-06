@@ -160,6 +160,8 @@ def __hview_h(args: list[str]) -> None:
                             sys.stdout.write(f.read())
                     else:
                         __hview_ls(result)
+            else:
+                print("hview: no file/directory found", file=sys.stderr)
         except subprocess.CalledProcessError as exc:
             raise HviewSilentException() from exc
 

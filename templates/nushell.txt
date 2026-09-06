@@ -86,6 +86,8 @@ export def --env --wrapped __hview_h [...rest: directory] {
             ls $match
           }
         }
+      } else {
+        echo 'hview: no file/directory found' >&2
       }
     }
   }

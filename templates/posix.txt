@@ -131,6 +131,8 @@ __hview_h() {
                     fi
                 }
             fi
+        else
+            \command printf 'hview: no file/directory found\n' >&2
         fi
     fi
 }
