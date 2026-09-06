@@ -90,20 +90,32 @@ eval "$(hview init posix --hook prompt)"
 
 ```sh
 h foo              # list the highest ranked directory matching foo
-h foo bar          # list the highest ranked directory matching foo and bar
-h foo /            # list a subdirectory starting with foo
-
 h ~/foo            # h also works like a regular ls command
 h foo/             # list relative path
 h ..               # list one level up
-h -                # list previous directory
 
 h /path/to/file    # cat a file, or ls a directory
-h -- /path/to/file # explicitly cat a file or ls a directory
 
 hi foo             # interactive selection (using fzf)
 
 h foo<SPACE><TAB>  # show interactive completions
+```
+
+### Files
+
+hview can also remember and open files. When you run `h` on a file path, it will `cat` the file instead of `ls`ing it. Files are added to the database automatically when you open them.
+
+```sh
+h install.sh       # cat the file install.sh
+h config.yaml   # explicitly cat the file config.yaml
+```
+
+### No matches
+
+If no matching file or directory is found, hview will print an error message:
+
+```sh
+hview: no file/directory found
 ```
 
 ## Configuration
