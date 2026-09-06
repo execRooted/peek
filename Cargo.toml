@@ -10,7 +10,7 @@ name = "hview"
 readme = "README.md"
 repository = "https://github.com/execRooted/hview"
 rust-version = "1.88.0"
-version = "1.5.5"
+version = "1.5.6"
 
 exclude = [
     "target/",
